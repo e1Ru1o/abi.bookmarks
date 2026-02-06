@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
 import { ParsedUrlQuery } from "querystring";
@@ -69,14 +68,13 @@ const ContractDetailPage = ({ addressFromUrl, chainIdFromUrl }: ServerSideProps)
     }
   }, [network, chains, setTargetNetwork]);
 
-  // Load bookmarked ABI from localStorage
+  // Load bookmarked ABI from localStorage (may be empty)
   useEffect(() => {
     if (!contractAddress || !network) return;
 
     const bookmark = getBookmarkedAbi(chainId, contractAddress);
-    if (bookmark && bookmark.abi.length > 0) {
-      setContractData({ address: contractAddress, abi: bookmark.abi });
-    }
+    const abi = bookmark?.abi ?? [];
+    setContractData({ address: contractAddress, abi: abi as Abi });
 
     // Track as recent
     addRecentContract(chainId, contractAddress);
@@ -130,39 +128,12 @@ const ContractDetailPage = ({ addressFromUrl, chainIdFromUrl }: ServerSideProps)
       <div className="bg-base-100 h-screen flex flex-col">
         <MiniHeader />
         <div className="flex flex-col gap-y-6 lg:gap-y-8 flex-grow h-full overflow-hidden">
-          {contractData && contractData.abi.length > 0 ? (
+          {contractData && (
             <ContractUI
               key={`${contractAddress}-${contractData.abi.length}`}
               initialContractData={contractData}
               onAddFunctions={() => setShowAbiInput(true)}
             />
-          ) : (
-            <div className="flex flex-col items-center justify-center flex-grow gap-6 px-4">
-              <div className="bg-base-200 rounded-2xl shadow-xl p-8 max-w-md w-full flex flex-col items-center gap-4">
-                <h2 className="text-xl font-bold text-center">No ABI Found</h2>
-                <p className="text-center text-base-content/70 text-sm">
-                  No saved ABI for <span className="font-mono bg-neutral px-2 py-0.5 rounded text-xs">{contractAddress}</span> on this network.
-                </p>
-                <p className="text-center text-base-content/70 text-sm">
-                  Import an ABI to start interacting with this contract.
-                </p>
-                <textarea
-                  className="textarea bg-neutral w-full h-32 resize-none font-mono text-sm"
-                  placeholder="Paste contract ABI in JSON format here"
-                  value={localContractAbi}
-                  onChange={e => setLocalContractAbi(e.target.value)}
-                />
-                <button
-                  className="btn btn-primary min-h-fit h-10 px-6 text-base font-semibold border-2 hover:bg-neutral hover:text-primary"
-                  onClick={handleImportAbi}
-                >
-                  Import ABI
-                </button>
-                <Link href="/" className="btn btn-ghost btn-sm mt-2">
-                  Back to home
-                </Link>
-              </div>
-            </div>
           )}
 
           {/* ABI Import Modal */}
