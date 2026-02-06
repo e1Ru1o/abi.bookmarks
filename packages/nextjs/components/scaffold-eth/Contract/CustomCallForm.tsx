@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { Address, Hex, TransactionReceipt, isHex, parseEther } from "viem";
+import { Address, Hex, TransactionReceipt, isHex } from "viem";
 import { useAccount, usePublicClient, useSendTransaction, useWaitForTransactionReceipt } from "wagmi";
-import { TxReceipt } from "~~/components/scaffold-eth";
+import { BytesInput, IntegerInput, TxReceipt } from "~~/components/scaffold-eth";
 import { useTransactor } from "~~/hooks/scaffold-eth";
 import { useGlobalState } from "~~/services/store/store";
 import { getParsedError, notification } from "~~/utils/scaffold-eth";
@@ -14,7 +14,6 @@ type CustomCallFormProps = {
 export const CustomCallForm = ({ contractAddress }: CustomCallFormProps) => {
   const mainChainId = useGlobalState(state => state.targetNetwork.id);
   const [txValue, setTxValue] = useState<string>("");
-  const [valueUnit, setValueUnit] = useState<"wei" | "ether">("ether");
   const [calldata, setCalldata] = useState<string>("");
   const [readResult, setReadResult] = useState<string>("");
   const { chain, address: connectedAddress } = useAccount();
@@ -35,9 +34,6 @@ export const CustomCallForm = ({ contractAddress }: CustomCallFormProps) => {
   const getValueInWei = (): bigint => {
     if (!txValue || txValue === "0" || txValue === "") return BigInt(0);
     try {
-      if (valueUnit === "ether") {
-        return parseEther(txValue);
-      }
       return BigInt(txValue);
     } catch {
       return BigInt(0);
@@ -84,44 +80,43 @@ export const CustomCallForm = ({ contractAddress }: CustomCallFormProps) => {
   return (
     <div className="py-5 space-y-3 first:pt-0 last:pb-1">
       <div className="flex flex-col gap-3">
-        <p className="font-medium my-0 break-words">Custom Call</p>
+        <p className="font-medium my-0 break-words">custom call</p>
 
         <div className="flex flex-col gap-1.5 w-full">
           <div className="flex items-center ml-2">
-            <span className="text-xs font-medium mr-2 leading-none">Value</span>
-            <select
-              className="select select-xs bg-base-300 rounded-md"
-              value={valueUnit}
-              onChange={e => setValueUnit(e.target.value as "wei" | "ether")}
-            >
-              <option value="ether">ETH</option>
-              <option value="wei">wei</option>
-            </select>
+            <span className="text-xs font-medium mr-2 leading-none">value</span>
+            <span className="block text-xs font-extralight leading-none">wei</span>
           </div>
-          <input
-            type="text"
-            className="input input-ghost focus-within:border-transparent focus:outline-none focus:bg-transparent focus:text-secondary-content h-[2.2rem] min-h-[2.2rem] px-4 border w-full font-medium placeholder:text-accent/50 text-secondary-content/75 bg-base-200"
-            placeholder={`0 ${valueUnit === "ether" ? "ETH" : "wei"}`}
+          <IntegerInput
             value={txValue}
-            onChange={e => setTxValue(e.target.value)}
+            onChange={updatedTxValue => {
+              setDisplayedTxResult(undefined);
+              setTxValue(updatedTxValue);
+            }}
+            placeholder="value (wei)"
+            name="custom-call-value"
           />
         </div>
 
         <div className="flex flex-col gap-1.5 w-full">
           <div className="flex items-center ml-2">
-            <span className="text-xs font-medium leading-none">Calldata (hex)</span>
+            <span className="text-xs font-medium mr-2 leading-none">calldata</span>
+            <span className="block text-xs font-extralight leading-none">bytes</span>
           </div>
-          <textarea
-            className="textarea bg-base-200 w-full h-20 resize-none font-mono text-sm"
-            placeholder="0x..."
+          <BytesInput
             value={calldata}
-            onChange={e => setCalldata(e.target.value)}
+            onChange={updatedCalldata => {
+              setDisplayedTxResult(undefined);
+              setCalldata(updatedCalldata);
+            }}
+            placeholder="0x..."
+            name="custom-call-data"
           />
         </div>
 
         {readResult && (
           <div className="bg-secondary rounded-3xl text-sm px-4 py-1.5 break-words overflow-auto">
-            <p className="font-bold m-0 mb-1">Static Call Result:</p>
+            <p className="font-bold m-0 mb-1">Result:</p>
             <pre className="whitespace-pre-wrap break-words font-mono text-xs">{readResult}</pre>
           </div>
         )}
@@ -133,8 +128,8 @@ export const CustomCallForm = ({ contractAddress }: CustomCallFormProps) => {
         )}
 
         <div className="flex justify-end gap-2">
-          <button className="btn btn-outline btn-sm" onClick={handleStaticCall}>
-            Static Call
+          <button className="btn btn-secondary btn-sm" onClick={handleStaticCall}>
+            Read
           </button>
           {connectedAddress ? (
             <div
@@ -146,7 +141,7 @@ export const CustomCallForm = ({ contractAddress }: CustomCallFormProps) => {
             >
               <button className="btn btn-secondary btn-sm" disabled={wrongNetwork || isPending} onClick={handleSend}>
                 {isPending && <span className="loading loading-spinner loading-xs"></span>}
-                Send Transaction
+                Send
               </button>
             </div>
           ) : (

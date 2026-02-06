@@ -197,12 +197,12 @@ export const ContractUI = ({ className = "", initialContractData, onAddFunctions
               {showCustomCall && (
                 <div className="z-10">
                   <div className="bg-base-200 rounded-2xl shadow-xl flex flex-col mt-10 relative">
-                    <div className="h-[5rem] w-[7rem] bg-accent absolute self-start rounded-[22px] -top-[38px] -left-[0px] -z-10 py-[0.65rem] shadow-lg shadow-base-300">
+                    <div className="h-[5rem] w-[7rem] bg-secondary absolute self-start rounded-[22px] -top-[38px] -left-[0px] -z-10 py-[0.65rem] shadow-lg shadow-base-300">
                       <div className="flex items-center justify-center space-x-2">
                         <p className="my-0 text-sm font-bold">Custom</p>
                       </div>
                     </div>
-                    <div className="px-5">
+                    <div className="divide-y divide-base-300 px-5">
                       <CustomCallForm contractAddress={initialContractData.address} />
                     </div>
                   </div>
