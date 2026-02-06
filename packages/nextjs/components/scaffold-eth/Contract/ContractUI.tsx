@@ -3,20 +3,21 @@ import { useRouter } from "next/router";
 import { ContractReadMethods } from "./ContractReadMethods";
 import { ContractVariables } from "./ContractVariables";
 import { ContractWriteMethods } from "./ContractWriteMethods";
+import { CustomCallForm } from "./CustomCallForm";
 import { AbiFunction } from "abitype";
 import { Abi, Address as AddressType } from "viem";
 import { useContractRead } from "wagmi";
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 import { MiniFooter } from "~~/components/MiniFooter";
 import { Address, Balance, MethodSelector } from "~~/components/scaffold-eth";
 import { useNetworkColor } from "~~/hooks/scaffold-eth";
-import useFetchContractCreationInfo from "~~/hooks/useFetchContractCreationInfo";
 import { useGlobalState } from "~~/services/store/store";
-import { getBlockExplorerTxLink, getTargetNetworks } from "~~/utils/scaffold-eth";
+import { getTargetNetworks } from "~~/utils/scaffold-eth";
 
 type ContractUIProps = {
   className?: string;
   initialContractData: { address: AddressType; abi: Abi };
+  onAddFunctions?: () => void;
 };
 
 export interface AugmentedAbiFunction extends AbiFunction {
@@ -61,21 +62,16 @@ const mainNetworks = getTargetNetworks();
 /**
  * UI component to interface with deployed contracts.
  **/
-export const ContractUI = ({ className = "", initialContractData }: ContractUIProps) => {
+export const ContractUI = ({ className = "", initialContractData, onAddFunctions }: ContractUIProps) => {
   const [refreshDisplayVariables, triggerRefreshDisplayVariables] = useReducer(value => !value, false);
-  const { implementationAddress, chainId } = useGlobalState(state => ({
+  const [showCustomCall, setShowCustomCall] = useState(false);
+  const { chainId } = useGlobalState(state => ({
     chainId: state.targetNetwork.id,
-    implementationAddress: state.implementationAddress,
   }));
   const mainNetwork = mainNetworks.find(network => network.id === chainId);
   const networkColor = useNetworkColor(mainNetwork);
   const router = useRouter();
   const { network } = router.query as { network?: string };
-
-  const { contractCreationInfo, isLoading: isContractCreationLoading } = useFetchContractCreationInfo({
-    contractAddress: initialContractData.address,
-    chainId,
-  });
 
   const updateUrlWithSelectedMethods = (selectedMethods: string[]) => {
     const currentQuery = new URLSearchParams(window.location.search);
@@ -102,7 +98,7 @@ export const ContractUI = ({ className = "", initialContractData }: ContractUIPr
     );
   }, [initialContractData.abi]);
 
-  // local abi state for for dispalying selected methods
+  // local abi state for displaying selected methods
   const [abi, setAbi] = useState<AugmentedAbiFunction[]>([]);
 
   const handleMethodSelect = (uid: string) => {
@@ -142,7 +138,6 @@ export const ContractUI = ({ className = "", initialContractData }: ContractUIPr
     if (contractNameData && typeof contractNameData === "string") {
       return contractNameData;
     }
-    // Default to "Contract" for errors or any other cases
     return "Contract";
   }, [isContractNameLoading, contractNameData]);
 
@@ -157,6 +152,9 @@ export const ContractUI = ({ className = "", initialContractData }: ContractUIPr
             abi={abi}
             onMethodSelect={handleMethodSelect}
             removeMethod={removeMethod}
+            showCustomCall={showCustomCall}
+            onToggleCustomCall={() => setShowCustomCall(!showCustomCall)}
+            onAddFunctions={onAddFunctions}
           />
           <MiniFooter />
         </ul>
@@ -196,6 +194,20 @@ export const ContractUI = ({ className = "", initialContractData }: ContractUIPr
                   </div>
                 </div>
               </div>
+              {showCustomCall && (
+                <div className="z-10">
+                  <div className="bg-base-200 rounded-2xl shadow-xl flex flex-col mt-10 relative">
+                    <div className="h-[5rem] w-[7rem] bg-accent absolute self-start rounded-[22px] -top-[38px] -left-[0px] -z-10 py-[0.65rem] shadow-lg shadow-base-300">
+                      <div className="flex items-center justify-center space-x-2">
+                        <p className="my-0 text-sm font-bold">Custom</p>
+                      </div>
+                    </div>
+                    <div className="px-5">
+                      <CustomCallForm contractAddress={initialContractData.address} />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="laptop:col-span-5 flex flex-col mt-10">
@@ -207,12 +219,6 @@ export const ContractUI = ({ className = "", initialContractData }: ContractUIPr
                       <span className="font-medium text-base mr-4"> {displayContractName} </span>
                       <Address address={initialContractData.address} />
                     </div>
-                    {implementationAddress && (
-                      <div className="flex items-center gap-1">
-                        <span className="font-medium text-base mr-4 text-green-600">Implementation Address</span>
-                        <Address address={implementationAddress} />
-                      </div>
-                    )}
                     <div className="flex items-center gap-1">
                       <span className="text-sm font-bold">Balance:</span>
                       <Balance address={initialContractData.address} className="h-1.5 min-h-[0.375rem] px-0" />
@@ -227,27 +233,14 @@ export const ContractUI = ({ className = "", initialContractData }: ContractUIPr
                     </span>
                   </p>
                 )}
-                {!isContractCreationLoading && contractCreationInfo && (
-                  <div className="my-0 text-sm flex items-center gap-2">
-                    <span className="font-bold">Created at:</span>
-                    {isContractCreationLoading ? (
-                      <span className="loading loading-spinner loading-xs"></span>
-                    ) : (
-                      contractCreationInfo && (
-                        <>
-                          <span>Block {contractCreationInfo.blockNumber}</span>
-                          <a
-                            href={getBlockExplorerTxLink(chainId, contractCreationInfo.txHash)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="link no-underline"
-                          >
-                            <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-                          </a>
-                        </>
-                      )
-                    )}
-                  </div>
+                {onAddFunctions && (
+                  <button
+                    className="btn btn-outline btn-sm mt-2 gap-1"
+                    onClick={onAddFunctions}
+                  >
+                    <PlusIcon className="h-4 w-4" />
+                    Add Functions
+                  </button>
                 )}
               </div>
               <div className="bg-base-200 shadow-xl rounded-2xl px-6 py-4">
