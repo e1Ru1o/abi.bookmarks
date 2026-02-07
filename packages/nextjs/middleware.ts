@@ -19,3 +19,8 @@ export function middleware(request: NextRequest) {
   // For all other requests, proceed with normal handling.
   return NextResponse.next();
 }
+
+// Only run on top-level paths, skip _next, api, static assets, etc.
+export const config = {
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|logo_inv.svg|thumbnail.png|blockexplorer).*)"],
+};
