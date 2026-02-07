@@ -127,9 +127,9 @@ export const CustomCallForm = ({ contractAddress }: CustomCallFormProps) => {
           </div>
         )}
 
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-between gap-2 flex-wrap">
           <button className="btn btn-secondary btn-sm" onClick={handleStaticCall}>
-            Read
+            Read 📡
           </button>
           {connectedAddress ? (
             <div
@@ -141,7 +141,7 @@ export const CustomCallForm = ({ contractAddress }: CustomCallFormProps) => {
             >
               <button className="btn btn-secondary btn-sm" disabled={wrongNetwork || isPending} onClick={handleSend}>
                 {isPending && <span className="loading loading-spinner loading-xs"></span>}
-                Send
+                Send 💸
               </button>
             </div>
           ) : (
