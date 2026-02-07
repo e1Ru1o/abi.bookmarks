@@ -71,7 +71,7 @@ const Home: NextPage = () => {
             </div>
 
             <div className="w-full max-w-sm flex flex-col items-center gap-4">
-              <div id="react-select-container" className="w-full">
+              <div id="react-select-container" className="w-full flex justify-center">
                 <NetworksDropdown onChange={option => setNetwork(option ? option.value.toString() : "")} />
               </div>
               <div className="w-full">
@@ -90,9 +90,28 @@ const Home: NextPage = () => {
               </button>
             </div>
 
+            {/* Recent Contracts */}
+            {recentContracts.length > 0 && (
+              <div className="w-full max-w-sm mt-10">
+                <span className="font-semibold text-sm mb-3 block">Recent</span>
+                <div className="flex flex-wrap gap-2">
+                  {recentContracts.slice(0, 6).map(rc => (
+                    <Link
+                      key={`${rc.chainId}:${rc.address}`}
+                      href={`/${rc.address}/${rc.chainId}`}
+                      className="badge badge-outline badge-lg gap-1 no-underline hover:bg-primary hover:text-primary-content transition-colors"
+                    >
+                      <span className="font-mono text-xs">{truncateAddress(rc.address)}</span>
+                      <span className="text-xs opacity-60">{getNetworkName(rc.chainId)}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Bookmarked Contracts */}
             {bookmarks.length > 0 && (
-              <div className="w-full max-w-sm mt-10">
+              <div className="w-full max-w-sm mt-6 mb-8">
                 <div className="flex items-center gap-2 mb-3">
                   <BookmarkIcon className="h-4 w-4 text-primary" />
                   <span className="font-semibold text-sm">Saved ABIs</span>
@@ -115,25 +134,6 @@ const Home: NextPage = () => {
                         <TrashIcon className="h-3.5 w-3.5 text-error/70" />
                       </button>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Recent Contracts */}
-            {recentContracts.length > 0 && (
-              <div className="w-full max-w-sm mt-6 mb-8">
-                <span className="font-semibold text-sm mb-3 block">Recent</span>
-                <div className="flex flex-wrap gap-2">
-                  {recentContracts.slice(0, 6).map(rc => (
-                    <Link
-                      key={`${rc.chainId}:${rc.address}`}
-                      href={`/${rc.address}/${rc.chainId}`}
-                      className="badge badge-outline badge-lg gap-1 no-underline hover:bg-primary hover:text-primary-content transition-colors"
-                    >
-                      <span className="font-mono text-xs">{truncateAddress(rc.address)}</span>
-                      <span className="text-xs opacity-60">{getNetworkName(rc.chainId)}</span>
-                    </Link>
                   ))}
                 </div>
               </div>
