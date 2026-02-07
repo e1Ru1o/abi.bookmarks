@@ -19,3 +19,9 @@ export function middleware(request: NextRequest) {
   // For all other requests, proceed with normal handling.
   return NextResponse.next();
 }
+
+// Only run middleware on paths that look like /0x... (contract addresses)
+// Skip _next, api, static assets, etc.
+export const config = {
+  matcher: ["/((?!_next|api|favicon\\.ico|placeholder\\.svg|.*\\..*).*)"],
+};
