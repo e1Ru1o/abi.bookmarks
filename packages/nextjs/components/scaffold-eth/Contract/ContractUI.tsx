@@ -126,7 +126,8 @@ export const ContractUI = ({ className = "", initialContractData, onAddFunctions
     // Notify parent to persist the removal with the original ABI entry
     if (method && onRemoveFromAbi) {
       // Strip the uid to get the original ABI entry
-      const { uid: _uid, ...abiEntry } = method;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { uid: _removed, ...abiEntry } = method;
       onRemoveFromAbi(abiEntry as AbiFunction);
     }
   };
@@ -248,10 +249,7 @@ export const ContractUI = ({ className = "", initialContractData, onAddFunctions
                   </p>
                 )}
                 {onAddFunctions && (
-                  <button
-                    className="btn btn-outline btn-sm mt-2 gap-1"
-                    onClick={onAddFunctions}
-                  >
+                  <button className="btn btn-outline btn-sm mt-2 gap-1" onClick={onAddFunctions}>
                     <PlusIcon className="h-4 w-4" />
                     Add Functions
                   </button>
