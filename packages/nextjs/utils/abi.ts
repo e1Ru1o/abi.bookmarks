@@ -43,6 +43,13 @@ export const fetchContractABIFromEtherscan = async (verifiedContractAddress: Add
 };
 
 export function parseAndCorrectJSON(input: string): any {
+  // First try direct parse
+  try {
+    return JSON.parse(input);
+  } catch {
+    // Fall through to correction
+  }
+
   // Add double quotes around keys
   let correctedJSON = input.replace(/(\w+)(?=\s*:)/g, '"$1"');
 
