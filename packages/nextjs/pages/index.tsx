@@ -90,7 +90,7 @@ const Home: NextPage = () => {
               </button>
             </div>
 
-            {/* Recent Contracts */}
+            {/* Recent Contracts - shown first */}
             {recentContracts.length > 0 && (
               <div className="w-full max-w-sm mt-10">
                 <span className="font-semibold text-sm mb-3 block">Recent</span>
