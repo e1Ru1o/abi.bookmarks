@@ -70,7 +70,7 @@ const getContractName = async (contractAddress: Address, networkId: number) => {
 };
 
 export const config = {
-  runtime: "edge",
+  runtime: "nodejs",
 };
 
 export default async function handler(request: NextRequest) {
