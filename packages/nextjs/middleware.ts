@@ -5,23 +5,21 @@ import type { NextRequest } from "next/server";
 const addressRegex = /^0x[a-fA-F0-9]{40}$/;
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  try {
+    const { pathname } = request.nextUrl;
 
-  // Extract the first path segment after the initial slash, if any.
-  const pathSegments = pathname.split("/").filter(Boolean);
+    // Extract the first path segment after the initial slash, if any.
+    const pathSegments = pathname.split("/").filter(Boolean);
 
-  // Check if there is exactly one path segment and if it matches the address regex.
-  if (pathSegments.length === 1 && addressRegex.test(pathSegments[0])) {
-    const newURL = new URL(`/${pathSegments[0]}/1`, request.url);
-    return NextResponse.redirect(newURL);
+    // Check if there is exactly one path segment and if it matches the address regex.
+    if (pathSegments.length === 1 && addressRegex.test(pathSegments[0])) {
+      const newURL = new URL(`/${pathSegments[0]}/1`, request.url);
+      return NextResponse.redirect(newURL);
+    }
+  } catch {
+    // If middleware fails for any reason, just continue
   }
 
   // For all other requests, proceed with normal handling.
   return NextResponse.next();
 }
-
-// Only run middleware on paths that look like /0x... (contract addresses)
-// Skip _next, api, static assets, etc.
-export const config = {
-  matcher: ["/((?!_next|api|favicon\\.ico|placeholder\\.svg|.*\\..*).*)"],
-};
