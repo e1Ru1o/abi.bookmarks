@@ -92,7 +92,7 @@ export const MethodSelector = ({
                 <div
                   role="button"
                   tabIndex={0}
-                  className={`btn btn-sm btn-ghost font-normal pr-1 w-full justify-between ${
+                  className={`btn btn-sm btn-ghost font-normal pr-1 w-full justify-between [&:has(.remove-btn:hover)]:bg-error/10 [&:has(.remove-btn:hover)]:border-error/20 ${
                     isMethodSelected(method.uid) ? "bg-neutral pointer-events-none" : ""
                   }`}
                   onClick={() => {
@@ -103,7 +103,7 @@ export const MethodSelector = ({
                   <span className="flex items-center gap-1">
                     {onRemoveFromAbi && (
                       <button
-                        className="flex-shrink-0 text-error/70 hover:text-error pointer-events-auto"
+                        className="remove-btn flex-shrink-0 text-error/70 hover:text-error hover:bg-error/20 rounded-md p-0.5 pointer-events-auto"
                         title={`Remove ${method.name} from ABI`}
                         onClick={event => {
                           event.stopPropagation();
@@ -154,7 +154,7 @@ export const MethodSelector = ({
                 <div
                   role="button"
                   tabIndex={0}
-                  className={`btn btn-sm btn-ghost font-normal pr-1 w-full justify-between ${
+                  className={`btn btn-sm btn-ghost font-normal pr-1 w-full justify-between [&:has(.remove-btn:hover)]:bg-error/10 [&:has(.remove-btn:hover)]:border-error/20 ${
                     isMethodSelected(method.uid) ? "bg-neutral pointer-events-none" : ""
                   }`}
                   onKeyDown={event => callOnMethodSelectOnSpaceOrEnter(event, method.uid)}
@@ -163,7 +163,7 @@ export const MethodSelector = ({
                   <span className="flex items-center gap-1">
                     {onRemoveFromAbi && (
                       <button
-                        className="flex-shrink-0 text-error/70 hover:text-error pointer-events-auto"
+                        className="remove-btn flex-shrink-0 text-error/70 hover:text-error hover:bg-error/20 rounded-md p-0.5 pointer-events-auto"
                         title={`Remove ${method.name} from ABI`}
                         onClick={event => {
                           event.stopPropagation();
