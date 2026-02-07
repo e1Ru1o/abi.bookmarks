@@ -6,21 +6,18 @@ const addressRegex = /^0x[a-fA-F0-9]{40}$/;
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // Extract the first path segment after the initial slash, if any.
   const pathSegments = pathname.split("/").filter(Boolean);
 
-  // Check if there is exactly one path segment and if it matches the address regex.
   if (pathSegments.length === 1 && addressRegex.test(pathSegments[0])) {
     const newURL = new URL(`/${pathSegments[0]}/1`, request.url);
     return NextResponse.redirect(newURL);
   }
 
-  // For all other requests, proceed with normal handling.
   return NextResponse.next();
 }
 
-// Only run on top-level paths, skip _next, api, static assets, etc.
+// Strictly limit to paths that look like bare contract addresses.
+// This prevents Edge Runtime from bundling unrelated project dependencies.
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|logo_inv.svg|thumbnail.png|blockexplorer).*)"],
+  matcher: "/:path(0x[a-fA-F0-9]{40})",
 };
