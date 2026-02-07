@@ -33,8 +33,6 @@ export const MethodSelector = ({
   const [isReadCollapsed, setIsReadCollapsed] = useState(false);
   const [isWriteCollapsed, setIsWriteCollapsed] = useState(false);
 
-  console.log("[v0] MethodSelector onRemoveFromAbi prop:", typeof onRemoveFromAbi, !!onRemoveFromAbi);
-
   const readMethods = readMethodsWithInputsAndWriteMethods.filter(
     method => method.stateMutability === "view" || method.stateMutability === "pure",
   );
@@ -90,16 +88,7 @@ export const MethodSelector = ({
         {!isReadCollapsed && (
           <div className="flex flex-col items-start gap-1 pb-4">
             {readMethods.map(method => (
-              <div key={method.uid} className="flex items-center gap-1 w-full pr-4">
-                {onRemoveFromAbi && (
-                  <button
-                    className="btn btn-ghost btn-xs btn-circle flex-shrink-0 text-error/70 hover:text-error hover:bg-error/10"
-                    title={`Remove ${method.name} from ABI`}
-                    onClick={() => onRemoveFromAbi(method.uid)}
-                  >
-                    <MinusIcon className="h-3.5 w-3.5" />
-                  </button>
-                )}
+              <div key={method.uid} className="flex items-center gap-2 w-full pr-4">
                 <div
                   role="button"
                   tabIndex={0}
@@ -111,7 +100,21 @@ export const MethodSelector = ({
                   }}
                   onKeyDown={event => callOnMethodSelectOnSpaceOrEnter(event, method.uid)}
                 >
-                  {method.name}
+                  <span className="flex items-center gap-1">
+                    {onRemoveFromAbi && (
+                      <button
+                        className="flex-shrink-0 text-error/70 hover:text-error pointer-events-auto"
+                        title={`Remove ${method.name} from ABI`}
+                        onClick={event => {
+                          event.stopPropagation();
+                          onRemoveFromAbi(method.uid);
+                        }}
+                      >
+                        <MinusIcon className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    {method.name}
+                  </span>
                   {isMethodSelected(method.uid) && (
                     <button
                       className="ml-4 text-xs hover:bg-base-100 rounded-md p-1 pointer-events-auto"
@@ -147,16 +150,7 @@ export const MethodSelector = ({
         {!isWriteCollapsed && (
           <div className="flex flex-col items-start gap-1 pb-4">
             {writeMethods.map((method, index) => (
-              <div key={index} className="flex items-center gap-1 w-full pr-4">
-                {onRemoveFromAbi && (
-                  <button
-                    className="btn btn-ghost btn-xs btn-circle flex-shrink-0 text-error/70 hover:text-error hover:bg-error/10"
-                    title={`Remove ${method.name} from ABI`}
-                    onClick={() => onRemoveFromAbi(method.uid)}
-                  >
-                    <MinusIcon className="h-3.5 w-3.5" />
-                  </button>
-                )}
+              <div key={index} className="flex items-center gap-2 w-full pr-4">
                 <div
                   role="button"
                   tabIndex={0}
@@ -166,7 +160,21 @@ export const MethodSelector = ({
                   onKeyDown={event => callOnMethodSelectOnSpaceOrEnter(event, method.uid)}
                   onClick={() => onMethodSelect(method.uid)}
                 >
-                  {method.name}
+                  <span className="flex items-center gap-1">
+                    {onRemoveFromAbi && (
+                      <button
+                        className="flex-shrink-0 text-error/70 hover:text-error pointer-events-auto"
+                        title={`Remove ${method.name} from ABI`}
+                        onClick={event => {
+                          event.stopPropagation();
+                          onRemoveFromAbi(method.uid);
+                        }}
+                      >
+                        <MinusIcon className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    {method.name}
+                  </span>
                   {isMethodSelected(method.uid) && (
                     <button
                       className="ml-4 text-xs hover:bg-base-100 rounded-md p-1 pointer-events-auto"
