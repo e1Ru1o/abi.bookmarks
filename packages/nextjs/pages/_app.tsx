@@ -69,7 +69,7 @@ const ScaffoldEthAppWithProviders = (props: AppProps) => {
   const wagmiConfig = useGlobalState(state => state.wagmiConfig);
 
   return (
-    <PlausibleProvider domain="abi.bookmarks">
+    <PlausibleProvider domain="abi.ninja">
       <ThemeProvider>
         <WagmiProvider config={wagmiConfig}>
           <QueryClientProvider client={queryClient}>

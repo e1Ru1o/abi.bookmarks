@@ -1,21 +1,12 @@
 import { type KeyboardEvent, useState } from "react";
 import { AugmentedAbiFunction } from "./ContractUI";
-import {
-  ChevronDownIcon,
-  ChevronRightIcon,
-  CommandLineIcon,
-  PlusIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { ChevronDownIcon, ChevronRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 type MethodSelectorProps = {
   readMethodsWithInputsAndWriteMethods: AugmentedAbiFunction[];
   abi: AugmentedAbiFunction[];
   onMethodSelect: (uid: string) => void;
   removeMethod: (uid: string) => void;
-  showCustomCall?: boolean;
-  onToggleCustomCall?: () => void;
-  onAddFunctions?: () => void;
 };
 
 export const MethodSelector = ({
@@ -23,9 +14,6 @@ export const MethodSelector = ({
   abi,
   onMethodSelect,
   removeMethod,
-  showCustomCall,
-  onToggleCustomCall,
-  onAddFunctions,
 }: MethodSelectorProps) => {
   const [isReadCollapsed, setIsReadCollapsed] = useState(false);
   const [isWriteCollapsed, setIsWriteCollapsed] = useState(false);
@@ -56,18 +44,6 @@ export const MethodSelector = ({
       <label htmlFor="sidebar" className="cursor-pointer block sm:hidden">
         <XMarkIcon className="h-5 w-5 mb-5 hover:opacity-70" />
       </label>
-
-      {/* Add Functions button */}
-      {onAddFunctions && (
-        <button
-          className="btn btn-outline btn-sm w-full mb-4 gap-1"
-          onClick={onAddFunctions}
-        >
-          <PlusIcon className="h-4 w-4" />
-          Add Functions (Import ABI)
-        </button>
-      )}
-
       <div>
         <h3
           className="font-semibold text-lg flex items-center cursor-pointer"
@@ -131,7 +107,7 @@ export const MethodSelector = ({
           Write
         </h3>
         {!isWriteCollapsed && (
-          <div className="flex flex-col items-start gap-1 pb-4">
+          <div className="flex flex-col items-start gap-1">
             {writeMethods.map((method, index) => (
               <div key={index} className="flex items-center gap-2 w-full pr-4">
                 <div
@@ -162,26 +138,6 @@ export const MethodSelector = ({
           </div>
         )}
       </div>
-
-      {/* Custom Call toggle */}
-      {onToggleCustomCall && (
-        <div className="mt-2 border-t border-base-300 pt-3">
-          <div
-            role="button"
-            tabIndex={0}
-            className={`btn btn-sm btn-ghost font-normal w-full justify-start gap-2 ${
-              showCustomCall ? "bg-neutral" : ""
-            }`}
-            onClick={onToggleCustomCall}
-          >
-            <CommandLineIcon className="h-4 w-4" />
-            Custom Call
-            {showCustomCall && (
-              <XMarkIcon className="h-4 w-4 ml-auto" />
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

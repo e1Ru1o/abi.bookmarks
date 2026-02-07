@@ -1,6 +1,5 @@
 export * from "./ContractInput";
 export * from "./ContractUI";
-export * from "./CustomCallForm";
 export * from "./DisplayVariable";
 export * from "./MethodSelector";
 export * from "./ReadOnlyFunctionForm";

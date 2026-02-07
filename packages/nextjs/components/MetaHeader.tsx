@@ -14,15 +14,13 @@ type MetaHeaderProps = {
 
 // Images must have an absolute path to work properly on Twitter.
 // We try to get it dynamically from Vercel, but we default to relative path.
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : `http://localhost:${process.env.PORT || 3000}`;
+const baseUrl = process.env.VERCEL_URL ? "https://abi.ninja" : `http://localhost:${process.env.PORT || 3000}`;
 
 export const MetaHeader = ({
   address,
   network,
-  title = "ABI Bookmarks",
-  description = "Save and interact with smart contracts on any EVM chain",
+  title = "ABI Ninja",
+  description = "Interact with smart contracts on any EVM chain",
   image = "thumbnail.png",
   twitterCard = "summary_large_image",
   children,
