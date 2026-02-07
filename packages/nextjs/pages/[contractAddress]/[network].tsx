@@ -14,6 +14,7 @@ import {
   addRecentContract,
   appendAbiToBookmark,
   getBookmarkedAbi,
+  removeFunctionFromBookmark,
   saveAbiBookmark,
 } from "~~/utils/abiBookmarks";
 import { notification } from "~~/utils/scaffold-eth";
@@ -81,6 +82,12 @@ const ContractDetailPage = ({ addressFromUrl, chainIdFromUrl }: ServerSideProps)
     setIsLoaded(true);
   }, [contractAddress, network, chainId]);
 
+  const handleRemoveFromAbi = (abiEntry: Abi[number]) => {
+    if (!contractAddress || !network) return;
+    const updatedAbi = removeFunctionFromBookmark(chainId, contractAddress, abiEntry);
+    setContractData({ address: contractAddress, abi: updatedAbi as Abi });
+  };
+
   const handleImportAbi = () => {
     if (!localContractAbi.trim()) {
       notification.error("Please provide an ABI.");
@@ -133,6 +140,7 @@ const ContractDetailPage = ({ addressFromUrl, chainIdFromUrl }: ServerSideProps)
               key={`${contractAddress}-${contractData.abi.length}`}
               initialContractData={contractData}
               onAddFunctions={() => setShowAbiInput(true)}
+              onRemoveFromAbi={handleRemoveFromAbi}
             />
           )}
 

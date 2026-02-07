@@ -18,6 +18,7 @@ type ContractUIProps = {
   className?: string;
   initialContractData: { address: AddressType; abi: Abi };
   onAddFunctions?: () => void;
+  onRemoveFromAbi?: (abiEntry: AbiFunction) => void;
 };
 
 export interface AugmentedAbiFunction extends AbiFunction {
@@ -62,7 +63,7 @@ const mainNetworks = getTargetNetworks();
 /**
  * UI component to interface with deployed contracts.
  **/
-export const ContractUI = ({ className = "", initialContractData, onAddFunctions }: ContractUIProps) => {
+export const ContractUI = ({ className = "", initialContractData, onAddFunctions, onRemoveFromAbi }: ContractUIProps) => {
   const [refreshDisplayVariables, triggerRefreshDisplayVariables] = useReducer(value => !value, false);
   const [showCustomCall, setShowCustomCall] = useState(false);
   const { chainId } = useGlobalState(state => ({
@@ -118,6 +119,18 @@ export const ContractUI = ({ className = "", initialContractData, onAddFunctions
     updateUrlWithSelectedMethods(updatedAbi.map(m => m.uid));
   };
 
+  const handleRemoveFromAbi = (uid: string) => {
+    const method = readMethodsWithInputsAndWriteMethods.find(m => m.uid === uid);
+    // Also deselect if currently selected
+    removeMethod(uid);
+    // Notify parent to persist the removal with the original ABI entry
+    if (method && onRemoveFromAbi) {
+      // Strip the uid to get the original ABI entry
+      const { uid: _uid, ...abiEntry } = method;
+      onRemoveFromAbi(abiEntry as AbiFunction);
+    }
+  };
+
   useEffect(() => {
     const selectedMethodNames = (router.query.methods as string)?.split(",") || [];
     const selectedMethods = readMethodsWithInputsAndWriteMethods.filter(method =>
@@ -155,6 +168,7 @@ export const ContractUI = ({ className = "", initialContractData, onAddFunctions
             showCustomCall={showCustomCall}
             onToggleCustomCall={() => setShowCustomCall(!showCustomCall)}
             onAddFunctions={onAddFunctions}
+            onRemoveFromAbi={onRemoveFromAbi ? handleRemoveFromAbi : undefined}
           />
           <MiniFooter />
         </ul>

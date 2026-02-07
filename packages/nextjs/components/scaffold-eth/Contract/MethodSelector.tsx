@@ -4,6 +4,7 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   CommandLineIcon,
+  MinusIcon,
   PlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -16,6 +17,7 @@ type MethodSelectorProps = {
   showCustomCall?: boolean;
   onToggleCustomCall?: () => void;
   onAddFunctions?: () => void;
+  onRemoveFromAbi?: (uid: string) => void;
 };
 
 export const MethodSelector = ({
@@ -26,6 +28,7 @@ export const MethodSelector = ({
   showCustomCall,
   onToggleCustomCall,
   onAddFunctions,
+  onRemoveFromAbi,
 }: MethodSelectorProps) => {
   const [isReadCollapsed, setIsReadCollapsed] = useState(false);
   const [isWriteCollapsed, setIsWriteCollapsed] = useState(false);
@@ -85,7 +88,16 @@ export const MethodSelector = ({
         {!isReadCollapsed && (
           <div className="flex flex-col items-start gap-1 pb-4">
             {readMethods.map(method => (
-              <div key={method.uid} className="flex items-center gap-2 w-full pr-4">
+              <div key={method.uid} className="flex items-center gap-1 w-full pr-4">
+                {onRemoveFromAbi && (
+                  <button
+                    className="btn btn-ghost btn-xs btn-circle flex-shrink-0 text-error/70 hover:text-error hover:bg-error/10"
+                    title={`Remove ${method.name} from ABI`}
+                    onClick={() => onRemoveFromAbi(method.uid)}
+                  >
+                    <MinusIcon className="h-3.5 w-3.5" />
+                  </button>
+                )}
                 <div
                   role="button"
                   tabIndex={0}
@@ -133,7 +145,16 @@ export const MethodSelector = ({
         {!isWriteCollapsed && (
           <div className="flex flex-col items-start gap-1 pb-4">
             {writeMethods.map((method, index) => (
-              <div key={index} className="flex items-center gap-2 w-full pr-4">
+              <div key={index} className="flex items-center gap-1 w-full pr-4">
+                {onRemoveFromAbi && (
+                  <button
+                    className="btn btn-ghost btn-xs btn-circle flex-shrink-0 text-error/70 hover:text-error hover:bg-error/10"
+                    title={`Remove ${method.name} from ABI`}
+                    onClick={() => onRemoveFromAbi(method.uid)}
+                  >
+                    <MinusIcon className="h-3.5 w-3.5" />
+                  </button>
+                )}
                 <div
                   role="button"
                   tabIndex={0}
