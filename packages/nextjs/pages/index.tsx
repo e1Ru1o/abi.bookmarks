@@ -67,7 +67,9 @@ const Home: NextPage = () => {
             <div className="flex flex-col items-center justify-center mb-8">
               <Image src="/logo_inv.svg" alt="logo" width={80} height={60} className="mb-3" />
               <h2 className="mb-0 text-4xl font-bold">ABI Bookmarks</h2>
-              <p className="text-base-content/70 text-sm mt-1">Save and interact with smart contracts on any EVM chain</p>
+              <p className="text-base-content/70 text-sm mt-1">
+                Save and interact with smart contracts on any EVM chain
+              </p>
             </div>
 
             <div className="w-full max-w-sm flex flex-col items-center gap-4">
@@ -75,11 +77,7 @@ const Home: NextPage = () => {
                 <NetworksDropdown onChange={option => setNetwork(option ? option.value.toString() : "")} />
               </div>
               <div className="w-full">
-                <AddressInput
-                  placeholder="Contract address"
-                  value={contractAddress}
-                  onChange={setContractAddress}
-                />
+                <AddressInput placeholder="Contract address" value={contractAddress} onChange={setContractAddress} />
               </div>
               <button
                 className="btn btn-primary min-h-fit h-10 px-8 text-base font-semibold border-2 hover:bg-neutral hover:text-primary"
@@ -118,7 +116,10 @@ const Home: NextPage = () => {
                 </div>
                 <div className="flex flex-col gap-1.5">
                   {bookmarks.slice(0, 5).map(bm => (
-                    <div key={`${bm.chainId}:${bm.address}`} className="flex items-center gap-2 bg-base-300 rounded-lg px-3 py-2">
+                    <div
+                      key={`${bm.chainId}:${bm.address}`}
+                      className="flex items-center gap-2 bg-base-300 rounded-lg px-3 py-2"
+                    >
                       <Link
                         href={`/${bm.address}/${bm.chainId}`}
                         className="flex-grow flex justify-between items-center no-underline text-base-content hover:text-primary transition-colors"

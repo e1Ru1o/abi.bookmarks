@@ -63,7 +63,12 @@ const mainNetworks = getTargetNetworks();
 /**
  * UI component to interface with deployed contracts.
  **/
-export const ContractUI = ({ className = "", initialContractData, onAddFunctions, onRemoveFromAbi }: ContractUIProps) => {
+export const ContractUI = ({
+  className = "",
+  initialContractData,
+  onAddFunctions,
+  onRemoveFromAbi,
+}: ContractUIProps) => {
   const [refreshDisplayVariables, triggerRefreshDisplayVariables] = useReducer(value => !value, false);
   const [showCustomCall, setShowCustomCall] = useState(false);
   const { chainId } = useGlobalState(state => ({
