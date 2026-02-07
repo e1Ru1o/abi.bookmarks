@@ -33,6 +33,8 @@ export const MethodSelector = ({
   const [isReadCollapsed, setIsReadCollapsed] = useState(false);
   const [isWriteCollapsed, setIsWriteCollapsed] = useState(false);
 
+  console.log("[v0] MethodSelector onRemoveFromAbi prop:", typeof onRemoveFromAbi, !!onRemoveFromAbi);
+
   const readMethods = readMethodsWithInputsAndWriteMethods.filter(
     method => method.stateMutability === "view" || method.stateMutability === "pure",
   );
