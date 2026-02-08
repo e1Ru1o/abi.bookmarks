@@ -5,7 +5,7 @@ import { InheritanceTooltip } from "./InheritanceTooltip";
 import { Abi, AbiFunction } from "abitype";
 import { Address, encodeFunctionData } from "viem";
 import { useReadContract } from "wagmi";
-import { CheckCircleIcon, DocumentDuplicateIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, DocumentDuplicateIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
   ContractInput,
   displayTxResult,
@@ -97,41 +97,43 @@ export const ReadOnlyFunctionForm = ({
         <InheritanceTooltip inheritedFrom={inheritedFrom} />
       </p>
       {inputElements}
-      <div className="flex flex-col md:flex-row justify-between gap-2 flex-wrap">
-        <div className="flex-grow w-full md:max-w-[80%]">
-          {result !== null && result !== undefined && (
-            <div className="bg-secondary rounded-3xl text-sm px-4 py-1.5 break-words overflow-auto">
-              <p className="font-bold m-0 mb-1">Result:</p>
-              <pre className="whitespace-pre-wrap break-words">{displayTxResult(result, "sm")}</pre>
-            </div>
-          )}
-        </div>
-        <div className="flex gap-1 self-end md:self-start">
-          <div className="tooltip tooltip-left" data-tip="Copy Calldata">
-            <button className="btn btn-ghost btn-sm" onClick={handleCopyCalldata}>
-              {calldataCopied ? (
-                <CheckCircleIcon
-                  className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer"
-                  aria-hidden="true"
-                />
-              ) : (
-                <DocumentDuplicateIcon className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer" />
-              )}
-            </button>
-          </div>
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={async () => {
-              const { data } = await refetch();
-              setResult(data);
-            }}
-            disabled={isFetching}
-          >
-            {isFetching && <span className="loading loading-spinner loading-xs"></span>}
-            Read 📡
+      <div className="flex justify-end gap-1">
+        <div className="tooltip tooltip-left" data-tip="Copy Calldata">
+          <button className="btn btn-ghost btn-sm" onClick={handleCopyCalldata}>
+            {calldataCopied ? (
+              <CheckCircleIcon
+                className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer"
+                aria-hidden="true"
+              />
+            ) : (
+              <DocumentDuplicateIcon className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer" />
+            )}
           </button>
         </div>
+        <button
+          className="btn btn-secondary btn-sm"
+          onClick={async () => {
+            const { data } = await refetch();
+            setResult(data);
+          }}
+          disabled={isFetching}
+        >
+          {isFetching && <span className="loading loading-spinner loading-xs"></span>}
+          Read 📡
+        </button>
       </div>
+      {result !== null && result !== undefined && (
+        <div className="bg-secondary rounded-3xl text-sm px-4 py-1.5 break-words overflow-auto w-full relative">
+          <button
+            className="absolute top-1.5 right-2 text-secondary-content/60 hover:text-secondary-content"
+            onClick={() => setResult(undefined)}
+          >
+            <XMarkIcon className="h-4 w-4" />
+          </button>
+          <p className="font-bold m-0 mb-1">Result:</p>
+          <pre className="whitespace-pre-wrap break-words">{displayTxResult(result, "sm")}</pre>
+        </div>
+      )}
     </div>
   );
 };

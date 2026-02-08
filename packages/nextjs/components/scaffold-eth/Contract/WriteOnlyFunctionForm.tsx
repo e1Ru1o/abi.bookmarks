@@ -4,7 +4,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { Abi, AbiFunction } from "abitype";
 import { Address, TransactionReceipt, encodeFunctionData } from "viem";
 import { useAccount, useConfig, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { CheckCircleIcon, DocumentDuplicateIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, DocumentDuplicateIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
   ContractInput,
   IntegerInput,
@@ -140,49 +140,48 @@ export const WriteOnlyFunctionForm = ({
             />
           </div>
         ) : null}
-        <div className={`flex justify-between gap-2 ${zeroInputs ? "mt-8" : "mt-0"}`}>
-          {!zeroInputs && (
-            <div className="flex-grow basis-0">
-              {displayedTxResult ? <TxReceipt txResult={displayedTxResult} /> : null}
-            </div>
-          )}
-          <div className="flex gap-2">
-            <div className="tooltip tooltip-left" data-tip="Copy Calldata">
-              <button className="btn btn-ghost btn-sm" onClick={handleCopyCalldata}>
-                {calldataCopied ? (
-                  <CheckCircleIcon
-                    className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <DocumentDuplicateIcon className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer" />
-                )}
-              </button>
-            </div>
-            {connectedAddress ? (
-              <div
-                className={`flex ${
-                  wrongNetwork &&
-                  "tooltip before:content-[attr(data-tip)] before:right-[-10px] before:left-auto before:transform-none"
-                }`}
-                data-tip={`${wrongNetwork && "Wrong network"}`}
-              >
-                <button className="btn btn-secondary btn-sm" disabled={wrongNetwork || isPending} onClick={handleWrite}>
-                  {isPending && <span className="loading loading-spinner loading-xs"></span>}
-                  Send 💸
-                </button>
-              </div>
-            ) : (
-              <button className="btn btn-secondary btn-sm" onClick={openConnectModal}>
-                Connect Wallet
-              </button>
-            )}
+        <div className={`flex justify-end gap-2 ${zeroInputs ? "mt-8" : "mt-0"}`}>
+          <div className="tooltip tooltip-left" data-tip="Copy Calldata">
+            <button className="btn btn-ghost btn-sm" onClick={handleCopyCalldata}>
+              {calldataCopied ? (
+                <CheckCircleIcon
+                  className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer"
+                  aria-hidden="true"
+                />
+              ) : (
+                <DocumentDuplicateIcon className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer" />
+              )}
+            </button>
           </div>
+          {connectedAddress ? (
+            <div
+              className={`flex ${
+                wrongNetwork &&
+                "tooltip before:content-[attr(data-tip)] before:right-[-10px] before:left-auto before:transform-none"
+              }`}
+              data-tip={`${wrongNetwork && "Wrong network"}`}
+            >
+              <button className="btn btn-secondary btn-sm" disabled={wrongNetwork || isPending} onClick={handleWrite}>
+                {isPending && <span className="loading loading-spinner loading-xs"></span>}
+                Send 💸
+              </button>
+            </div>
+          ) : (
+            <button className="btn btn-secondary btn-sm" onClick={openConnectModal}>
+              Connect Wallet
+            </button>
+          )}
         </div>
       </div>
-      {zeroInputs && txResult ? (
-        <div className="flex-grow basis-0">
-          <TxReceipt txResult={txResult} />
+      {displayedTxResult ? (
+        <div className="relative w-full">
+          <button
+            className="absolute top-1.5 right-2 z-10 text-secondary-content/60 hover:text-secondary-content"
+            onClick={() => setDisplayedTxResult(undefined)}
+          >
+            <XMarkIcon className="h-4 w-4" />
+          </button>
+          <TxReceipt txResult={displayedTxResult} />
         </div>
       ) : null}
     </div>
