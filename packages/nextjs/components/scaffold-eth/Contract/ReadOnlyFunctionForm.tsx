@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { InheritanceTooltip } from "./InheritanceTooltip";
 import { Abi, AbiFunction } from "abitype";
-import { Address } from "viem";
+import { Address, encodeFunctionData } from "viem";
 import { useReadContract } from "wagmi";
+import { CheckCircleIcon, DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import {
   ContractInput,
   displayTxResult,
@@ -32,6 +33,7 @@ export const ReadOnlyFunctionForm = ({
   const mainChainId = useGlobalState(state => state.targetNetwork.id);
   const [form, setForm] = useState<Record<string, any>>(() => getInitialFormState(abiFunction));
   const [result, setResult] = useState<unknown>();
+  const [calldataCopied, setCalldataCopied] = useState(false);
 
   const { isFetching, refetch, error } = useReadContract({
     address: contractAddress,
@@ -51,6 +53,25 @@ export const ReadOnlyFunctionForm = ({
       notification.error(parsedError);
     }
   }, [error]);
+
+  const handleCopyCalldata = async () => {
+    try {
+      const calldata = encodeFunctionData({
+        abi: abi,
+        functionName: abiFunction.name,
+        args: getParsedContractFunctionArgs(form),
+      });
+      await navigator.clipboard.writeText(calldata);
+      setCalldataCopied(true);
+      setTimeout(() => {
+        setCalldataCopied(false);
+      }, 800);
+    } catch (e) {
+      const errorMessage = getParsedError(e);
+      console.error("Error copying calldata:", e);
+      notification.error(errorMessage);
+    }
+  };
 
   const transformedFunction = transformAbiFunction(abiFunction);
   const inputElements = transformedFunction.inputs.map((input, inputIndex) => {
@@ -85,17 +106,31 @@ export const ReadOnlyFunctionForm = ({
             </div>
           )}
         </div>
-        <button
-          className="btn btn-secondary btn-sm self-end md:self-start"
-          onClick={async () => {
-            const { data } = await refetch();
-            setResult(data);
-          }}
-          disabled={isFetching}
-        >
-          {isFetching && <span className="loading loading-spinner loading-xs"></span>}
-          Read 📡
-        </button>
+        <div className="flex gap-1 self-end md:self-start">
+          <div className="tooltip tooltip-left" data-tip="Copy Calldata">
+            <button className="btn btn-ghost btn-sm" onClick={handleCopyCalldata}>
+              {calldataCopied ? (
+                <CheckCircleIcon
+                  className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer"
+                  aria-hidden="true"
+                />
+              ) : (
+                <DocumentDuplicateIcon className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer" />
+              )}
+            </button>
+          </div>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={async () => {
+              const { data } = await refetch();
+              setResult(data);
+            }}
+            disabled={isFetching}
+          >
+            {isFetching && <span className="loading loading-spinner loading-xs"></span>}
+            Read 📡
+          </button>
+        </div>
       </div>
     </div>
   );

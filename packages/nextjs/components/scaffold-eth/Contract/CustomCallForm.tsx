@@ -149,7 +149,7 @@ export const CustomCallForm = ({ contractAddress, onClose }: CustomCallFormProps
           >
             <button className="btn btn-secondary btn-sm" disabled={wrongNetwork || isPending} onClick={handleSend}>
               {isPending && <span className="loading loading-spinner loading-xs"></span>}
-              Send
+              Send 💸
             </button>
           </div>
         ) : (
