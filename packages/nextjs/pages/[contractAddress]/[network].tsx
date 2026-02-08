@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { AbiFunction } from "abitype";
 import { GetServerSideProps } from "next";
 import { ParsedUrlQuery } from "querystring";
 import { Abi, Address, isAddress } from "viem";
@@ -10,7 +11,13 @@ import { SwitchTheme } from "~~/components/SwitchTheme";
 import { ContractUI } from "~~/components/scaffold-eth";
 import { useGlobalState } from "~~/services/store/store";
 import { parseAndCorrectJSON } from "~~/utils/abi";
-import { addRecentContract, appendAbiToBookmark, getBookmarkedAbi, saveAbiBookmark } from "~~/utils/abiBookmarks";
+import {
+  addRecentContract,
+  appendAbiToBookmark,
+  getBookmarkedAbi,
+  removeFunctionFromBookmark,
+  saveAbiBookmark,
+} from "~~/utils/abiBookmarks";
 import { notification } from "~~/utils/scaffold-eth";
 
 interface ParsedQueryContractDetailsPage extends ParsedUrlQuery {
@@ -75,6 +82,11 @@ const ContractDetailPage = ({ addressFromUrl, chainIdFromUrl }: ServerSideProps)
     setIsLoaded(true);
   }, [contractAddress, network, chainId]);
 
+  const handleRemoveFromAbi = (abiFunction: AbiFunction) => {
+    const updatedAbi = removeFunctionFromBookmark(chainId, contractAddress, abiFunction);
+    setContractData({ address: contractAddress, abi: updatedAbi as Abi });
+  };
+
   const handleImportAbi = () => {
     if (!localContractAbi.trim()) {
       notification.error("Please provide an ABI.");
@@ -129,6 +141,7 @@ const ContractDetailPage = ({ addressFromUrl, chainIdFromUrl }: ServerSideProps)
               key={`${contractAddress}-${contractData.abi.length}`}
               initialContractData={contractData}
               onAddFunctions={() => setShowAbiInput(true)}
+              onRemoveFromAbi={handleRemoveFromAbi}
             />
           )}
 

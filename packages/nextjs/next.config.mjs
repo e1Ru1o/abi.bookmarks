@@ -1,8 +1,8 @@
 // @ts-check
 // eslint-disable-next-line @typescript-eslint/no-var-requires
+import { withPlausibleProxy } from "next-plausible";
 import path from "path";
 import { fileURLToPath } from "url";
-import { withPlausibleProxy } from "next-plausible";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,7 +22,9 @@ const nextConfig = {
     "@vanilla-extract/css",
     "@vanilla-extract/dynamic",
     "@vanilla-extract/sprinkles",
-    "viem",
+    // viem must be transpiled in production to avoid EMFILE on Vercel serverless,
+    // but breaks dev mode due to @safe-global's nested viem CJS using import.meta
+    ...(process.env.NODE_ENV === "production" ? ["viem"] : []),
   ],
   webpack: config => {
     config.resolve.fallback = { fs: false, net: false, tls: false };

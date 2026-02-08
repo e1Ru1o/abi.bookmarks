@@ -75,6 +75,21 @@ export function appendAbiToBookmark(chainId: number, address: string, newAbiEntr
   return merged as Abi;
 }
 
+export function removeFunctionFromBookmark(chainId: number, address: string, abiEntry: unknown): Abi {
+  const existing = getBookmarkedAbi(chainId, address);
+  if (!existing) return [];
+
+  const entryStr = JSON.stringify(abiEntry);
+  const updatedAbi = existing.abi.filter(entry => JSON.stringify(entry) !== entryStr);
+
+  if (updatedAbi.length === 0) {
+    removeAbiBookmark(chainId, address);
+  } else {
+    saveAbiBookmark(chainId, address, updatedAbi as Abi, existing.label);
+  }
+  return updatedAbi as Abi;
+}
+
 export function removeAbiBookmark(chainId: number, address: string): void {
   const bookmarks = getAllBookmarks();
   const key = getStorageKey(chainId, address);

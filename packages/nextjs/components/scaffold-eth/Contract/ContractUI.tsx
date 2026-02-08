@@ -18,6 +18,7 @@ type ContractUIProps = {
   className?: string;
   initialContractData: { address: AddressType; abi: Abi };
   onAddFunctions?: () => void;
+  onRemoveFromAbi?: (abiFunction: AbiFunction) => void;
 };
 
 export interface AugmentedAbiFunction extends AbiFunction {
@@ -58,7 +59,12 @@ const mainNetworks = getTargetNetworks();
 /**
  * UI component to interface with deployed contracts.
  **/
-export const ContractUI = ({ className = "", initialContractData, onAddFunctions }: ContractUIProps) => {
+export const ContractUI = ({
+  className = "",
+  initialContractData,
+  onAddFunctions,
+  onRemoveFromAbi,
+}: ContractUIProps) => {
   const [refreshDisplayVariables, triggerRefreshDisplayVariables] = useReducer(value => !value, false);
   const [showCustomCall, setShowCustomCall] = useState(false);
   const { chainId } = useGlobalState(state => ({
@@ -151,6 +157,18 @@ export const ContractUI = ({ className = "", initialContractData, onAddFunctions
             showCustomCall={showCustomCall}
             onToggleCustomCall={() => setShowCustomCall(!showCustomCall)}
             onAddFunctions={onAddFunctions}
+            onRemoveFromAbi={
+              onRemoveFromAbi
+                ? (uid: string) => {
+                    const method = readMethodsWithInputsAndWriteMethods.find(m => m.uid === uid);
+                    if (method) {
+                      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                      const { uid: _uid, ...abiFunction } = method;
+                      onRemoveFromAbi(abiFunction);
+                    }
+                  }
+                : undefined
+            }
           />
           <MiniFooter />
         </ul>
