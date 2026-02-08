@@ -98,7 +98,7 @@ const Home: NextPage = () => {
                       href={`/${rc.address}/${rc.chainId}`}
                       className="badge badge-outline badge-lg gap-1 no-underline hover:bg-primary hover:text-primary-content transition-colors"
                     >
-                      <span className="font-mono text-xs">{truncateAddress(rc.address)}</span>
+                      <span className="font-mono text-xs">{rc.label || truncateAddress(rc.address)}</span>
                       <span className="text-xs opacity-60">{getNetworkName(rc.chainId)}</span>
                     </Link>
                   ))}
@@ -120,10 +120,15 @@ const Home: NextPage = () => {
                     >
                       <Link
                         href={`/${bm.address}/${bm.chainId}`}
-                        className="flex-grow flex justify-between items-center no-underline text-base-content hover:text-primary transition-colors"
+                        className="flex-grow flex justify-between items-center no-underline text-base-content hover:text-primary transition-colors min-w-0"
                       >
-                        <span className="font-mono text-sm">{truncateAddress(bm.address)}</span>
-                        <span className="text-xs text-base-content/60">{getNetworkName(bm.chainId)}</span>
+                        <div className="flex flex-col min-w-0">
+                          {bm.label && <span className="text-sm font-medium truncate">{bm.label}</span>}
+                          <span className="font-mono text-xs text-base-content/60 truncate">
+                            {truncateAddress(bm.address)}
+                          </span>
+                        </div>
+                        <span className="text-xs text-base-content/60 shrink-0 ml-2">{getNetworkName(bm.chainId)}</span>
                       </Link>
                       <button
                         className="btn btn-ghost btn-xs px-1"

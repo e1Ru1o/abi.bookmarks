@@ -17,6 +17,7 @@ import {
   getBookmarkedAbi,
   removeFunctionFromBookmark,
   saveAbiBookmark,
+  updateBookmarkLabel,
 } from "~~/utils/abiBookmarks";
 import { notification } from "~~/utils/scaffold-eth";
 
@@ -51,6 +52,7 @@ const ContractDetailPage = ({ addressFromUrl, chainIdFromUrl }: ServerSideProps)
   const [localContractAbi, setLocalContractAbi] = useState<string>("");
   const [showAbiInput, setShowAbiInput] = useState(false);
   const [contractData, setContractData] = useState<{ address: Address; abi: Abi } | null>(null);
+  const [contractLabel, setContractLabel] = useState<string | undefined>(undefined);
   const [isLoaded, setIsLoaded] = useState(false);
 
   const { chains, setTargetNetwork } = useGlobalState(state => ({
@@ -77,10 +79,18 @@ const ContractDetailPage = ({ addressFromUrl, chainIdFromUrl }: ServerSideProps)
     const bookmark = getBookmarkedAbi(chainId, contractAddress);
     const abi = bookmark?.abi ?? [];
     setContractData({ address: contractAddress, abi: abi as Abi });
+    setContractLabel(bookmark?.label);
 
-    addRecentContract(chainId, contractAddress);
+    addRecentContract(chainId, contractAddress, bookmark?.label);
     setIsLoaded(true);
   }, [contractAddress, network, chainId]);
+
+  const handleLabelChange = (newLabel: string) => {
+    const label = newLabel || undefined;
+    setContractLabel(label);
+    updateBookmarkLabel(chainId, contractAddress, label);
+    addRecentContract(chainId, contractAddress, label);
+  };
 
   const handleRemoveFromAbi = (abiFunction: AbiFunction) => {
     const updatedAbi = removeFunctionFromBookmark(chainId, contractAddress, abiFunction);
@@ -102,7 +112,7 @@ const ContractDetailPage = ({ addressFromUrl, chainIdFromUrl }: ServerSideProps)
       if (contractData && contractData.abi.length > 0) {
         finalAbi = appendAbiToBookmark(chainId, contractAddress, parsedAbi);
       } else {
-        saveAbiBookmark(chainId, contractAddress, parsedAbi);
+        saveAbiBookmark(chainId, contractAddress, parsedAbi, contractLabel);
         finalAbi = parsedAbi;
       }
 
@@ -142,6 +152,8 @@ const ContractDetailPage = ({ addressFromUrl, chainIdFromUrl }: ServerSideProps)
               initialContractData={contractData}
               onAddFunctions={() => setShowAbiInput(true)}
               onRemoveFromAbi={handleRemoveFromAbi}
+              contractLabel={contractLabel}
+              onLabelChange={handleLabelChange}
             />
           )}
 

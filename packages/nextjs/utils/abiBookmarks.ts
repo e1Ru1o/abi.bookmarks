@@ -97,6 +97,16 @@ export function removeAbiBookmark(chainId: number, address: string): void {
   saveAllBookmarks(bookmarks);
 }
 
+export function updateBookmarkLabel(chainId: number, address: string, label: string | undefined): void {
+  const bookmarks = getAllBookmarks();
+  const key = getStorageKey(chainId, address);
+  const existing = bookmarks[key];
+  if (!existing) return;
+  existing.label = label || undefined;
+  existing.updatedAt = Date.now();
+  saveAllBookmarks(bookmarks);
+}
+
 export function getAllBookmarksList(): AbiBookmark[] {
   const bookmarks = getAllBookmarks();
   return Object.values(bookmarks).sort((a, b) => b.updatedAt - a.updatedAt);
