@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { ContractReadMethods } from "./ContractReadMethods";
 import { ContractVariables } from "./ContractVariables";
@@ -71,6 +71,7 @@ export const ContractUI = ({
 }: ContractUIProps) => {
   const [isEditingLabel, setIsEditingLabel] = useState(false);
   const [labelDraft, setLabelDraft] = useState(contractLabel || "");
+  const userEditedLabel = useRef(!!contractLabel);
   const [refreshDisplayVariables, triggerRefreshDisplayVariables] = useReducer(value => !value, false);
   const [showCustomCall, setShowCustomCall] = useState(false);
   const { chainId } = useGlobalState(state => ({
@@ -150,8 +151,9 @@ export const ContractUI = ({
   }, [isContractNameLoading, contractNameData]);
 
   useEffect(() => {
-    if (!contractLabel && contractNameData && typeof contractNameData === "string") {
+    if (!userEditedLabel.current && contractNameData && typeof contractNameData === "string") {
       onLabelChange?.(contractNameData);
+      userEditedLabel.current = true;
     }
   }, [contractNameData]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -252,6 +254,7 @@ export const ContractUI = ({
                           onChange={e => setLabelDraft(e.target.value)}
                           onKeyDown={e => {
                             if (e.key === "Enter") {
+                              userEditedLabel.current = true;
                               onLabelChange?.(labelDraft.trim());
                               setIsEditingLabel(false);
                             }
@@ -261,6 +264,7 @@ export const ContractUI = ({
                             }
                           }}
                           onBlur={() => {
+                            userEditedLabel.current = true;
                             onLabelChange?.(labelDraft.trim());
                             setIsEditingLabel(false);
                           }}
