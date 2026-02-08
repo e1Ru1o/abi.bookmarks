@@ -86,44 +86,41 @@ export const MethodSelector = ({
             {readMethods.map(method => (
               <div
                 key={method.uid}
-                className={`flex items-center gap-1 w-full pr-4 rounded-lg ${
-                  onRemoveFromAbi ? "[&:has(.remove-btn:hover)]:bg-error/10" : ""
-                }`}
+                role="button"
+                tabIndex={0}
+                className={`btn btn-sm btn-ghost font-normal pr-1 w-full justify-between ${
+                  isMethodSelected(method.uid) ? "bg-neutral pointer-events-none" : ""
+                } ${onRemoveFromAbi ? "[&:has(.remove-btn:hover)]:bg-error/10" : ""}`}
+                onClick={() => onMethodSelect(method.uid)}
+                onKeyDown={event => callOnMethodSelectOnSpaceOrEnter(event, method.uid)}
               >
-                {onRemoveFromAbi && (
-                  <button
-                    className="remove-btn btn btn-ghost btn-xs px-0.5 text-base-content/40 hover:text-error"
-                    onClick={() => onRemoveFromAbi(method.uid)}
-                    aria-label={`Remove ${method.name} from ABI`}
-                  >
-                    <MinusIcon className="h-3.5 w-3.5" />
-                  </button>
-                )}
-                <div
-                  role="button"
-                  tabIndex={0}
-                  className={`btn btn-sm btn-ghost font-normal pr-1 flex-1 justify-between ${
-                    isMethodSelected(method.uid) ? "bg-neutral pointer-events-none" : ""
-                  }`}
-                  onClick={() => {
-                    onMethodSelect(method.uid);
-                  }}
-                  onKeyDown={event => callOnMethodSelectOnSpaceOrEnter(event, method.uid)}
-                >
-                  {method.name}
-                  {isMethodSelected(method.uid) && (
+                <span className="flex items-center gap-1">
+                  {onRemoveFromAbi && (
                     <button
-                      className="ml-4 text-xs hover:bg-base-100 rounded-md p-1 pointer-events-auto"
+                      className="remove-btn pointer-events-auto text-base-content/40 hover:text-error hover:bg-base-100 rounded-md p-1"
                       onClick={event => {
-                        removeMethod(method.uid);
                         event.stopPropagation();
+                        onRemoveFromAbi(method.uid);
                       }}
-                      onKeyDown={event => event.stopPropagation()}
+                      aria-label={`Remove ${method.name} from ABI`}
                     >
-                      <XMarkIcon className="h-4 w-4" />
+                      <MinusIcon className="h-3.5 w-3.5" />
                     </button>
                   )}
-                </div>
+                  {method.name}
+                </span>
+                {isMethodSelected(method.uid) && (
+                  <button
+                    className="ml-4 text-xs hover:bg-base-100 rounded-md p-1 pointer-events-auto"
+                    onClick={event => {
+                      removeMethod(method.uid);
+                      event.stopPropagation();
+                    }}
+                    onKeyDown={event => event.stopPropagation()}
+                  >
+                    <XMarkIcon className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -148,42 +145,41 @@ export const MethodSelector = ({
             {writeMethods.map(method => (
               <div
                 key={method.uid}
-                className={`flex items-center gap-1 w-full pr-4 rounded-lg ${
-                  onRemoveFromAbi ? "[&:has(.remove-btn:hover)]:bg-error/10" : ""
-                }`}
+                role="button"
+                tabIndex={0}
+                className={`btn btn-sm btn-ghost font-normal pr-1 w-full justify-between ${
+                  isMethodSelected(method.uid) ? "bg-neutral pointer-events-none" : ""
+                } ${onRemoveFromAbi ? "[&:has(.remove-btn:hover)]:bg-error/10" : ""}`}
+                onClick={() => onMethodSelect(method.uid)}
+                onKeyDown={event => callOnMethodSelectOnSpaceOrEnter(event, method.uid)}
               >
-                {onRemoveFromAbi && (
-                  <button
-                    className="remove-btn btn btn-ghost btn-xs px-0.5 text-base-content/40 hover:text-error"
-                    onClick={() => onRemoveFromAbi(method.uid)}
-                    aria-label={`Remove ${method.name} from ABI`}
-                  >
-                    <MinusIcon className="h-3.5 w-3.5" />
-                  </button>
-                )}
-                <div
-                  role="button"
-                  tabIndex={0}
-                  className={`btn btn-sm btn-ghost font-normal pr-1 flex-1 justify-between ${
-                    isMethodSelected(method.uid) ? "bg-neutral pointer-events-none" : ""
-                  }`}
-                  onKeyDown={event => callOnMethodSelectOnSpaceOrEnter(event, method.uid)}
-                  onClick={() => onMethodSelect(method.uid)}
-                >
-                  {method.name}
-                  {isMethodSelected(method.uid) && (
+                <span className="flex items-center gap-1">
+                  {onRemoveFromAbi && (
                     <button
-                      className="ml-4 text-xs hover:bg-base-100 rounded-md p-1 pointer-events-auto"
+                      className="remove-btn pointer-events-auto text-base-content/40 hover:text-error hover:bg-base-100 rounded-md p-1"
                       onClick={event => {
-                        removeMethod(method.uid);
                         event.stopPropagation();
+                        onRemoveFromAbi(method.uid);
                       }}
-                      onKeyDown={event => event.stopPropagation()}
+                      aria-label={`Remove ${method.name} from ABI`}
                     >
-                      <XMarkIcon className="h-4 w-4" />
+                      <MinusIcon className="h-3.5 w-3.5" />
                     </button>
                   )}
-                </div>
+                  {method.name}
+                </span>
+                {isMethodSelected(method.uid) && (
+                  <button
+                    className="ml-4 text-xs hover:bg-base-100 rounded-md p-1 pointer-events-auto"
+                    onClick={event => {
+                      removeMethod(method.uid);
+                      event.stopPropagation();
+                    }}
+                    onKeyDown={event => event.stopPropagation()}
+                  >
+                    <XMarkIcon className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             ))}
           </div>
