@@ -21,8 +21,7 @@ export const NetworkOptions = ({ hidden = false }: NetworkOptionsProps) => {
   }));
 
   const filteredChains = chains.filter(allowedNetwork => allowedNetwork.id === mainChainId);
-  // if chainId is 31337 we render one element, since viem chains have 3 chains with same chainId.
-  const networksToRender = mainChainId === 31337 ? [filteredChains[0]] : filteredChains;
+  const networksToRender = filteredChains.length > 0 ? [filteredChains[0]] : [];
 
   return (
     <>

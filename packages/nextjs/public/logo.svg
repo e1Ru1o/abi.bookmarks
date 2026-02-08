@@ -24,7 +24,7 @@
   <!-- Spine -->
   <line x1="50" y1="11" x2="50" y2="77" stroke="#7B68C8" stroke-width="2"/>
   <!-- ABI on left page -->
-  <text x="30" y="49" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="17" fill="white">ABI</text>
+  <text x="30" y="49" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="17" fill="#1A1A2E">ABI</text>
   <!-- {} on right page -->
-  <text x="70" y="50" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="20" fill="white">{}</text>
+  <text x="70" y="50" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="20" fill="#1A1A2E">{}</text>
 </svg>

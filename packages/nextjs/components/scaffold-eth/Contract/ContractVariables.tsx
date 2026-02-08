@@ -5,9 +5,11 @@ import { Contract, ContractName, GenericContract, InheritedFunctions } from "~~/
 export const ContractVariables = ({
   refreshDisplayVariables,
   deployedContractData,
+  onRemoveFromAbi,
 }: {
   refreshDisplayVariables: boolean;
   deployedContractData: Contract<ContractName>;
+  onRemoveFromAbi?: (abiFunction: AbiFunction) => void;
 }) => {
   if (!deployedContractData) {
     return null;
@@ -43,6 +45,7 @@ export const ContractVariables = ({
           key={fn.name}
           refreshDisplayVariables={refreshDisplayVariables}
           inheritedFrom={inheritedFrom}
+          onRemoveFromAbi={onRemoveFromAbi}
         />
       ))}
     </>

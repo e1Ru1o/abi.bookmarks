@@ -262,6 +262,13 @@ export const ContractUI = ({
                 <ContractVariables
                   refreshDisplayVariables={refreshDisplayVariables}
                   deployedContractData={initialContractData}
+                  onRemoveFromAbi={
+                    onRemoveFromAbi
+                      ? (abiFunction: AbiFunction) => {
+                          onRemoveFromAbi(abiFunction);
+                        }
+                      : undefined
+                  }
                 />
               </div>
             </div>

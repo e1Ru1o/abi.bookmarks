@@ -3,7 +3,7 @@ import { InheritanceTooltip } from "./InheritanceTooltip";
 import { Abi, AbiFunction } from "abitype";
 import { Address } from "viem";
 import { useReadContract } from "wagmi";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { displayTxResult } from "~~/components/scaffold-eth";
 import { useAnimationConfig } from "~~/hooks/scaffold-eth";
 import { useGlobalState } from "~~/services/store/store";
@@ -15,6 +15,7 @@ type DisplayVariableProps = {
   refreshDisplayVariables: boolean;
   inheritedFrom?: string;
   abi: Abi;
+  onRemoveFromAbi?: (abiFunction: AbiFunction) => void;
 };
 
 export const DisplayVariable = ({
@@ -23,6 +24,7 @@ export const DisplayVariable = ({
   refreshDisplayVariables,
   abi,
   inheritedFrom,
+  onRemoveFromAbi,
 }: DisplayVariableProps) => {
   const mainChainId = useGlobalState(state => state.targetNetwork.id);
   const {
@@ -61,6 +63,15 @@ export const DisplayVariable = ({
             <ArrowPathIcon className="h-3 w-3 cursor-pointer" aria-hidden="true" />
           )}
         </button>
+        {onRemoveFromAbi && (
+          <button
+            className="btn btn-ghost btn-xs px-0.5 text-base-content/40 hover:text-error"
+            onClick={() => onRemoveFromAbi(abiFunction)}
+            aria-label={`Remove ${abiFunction.name} from ABI`}
+          >
+            <XMarkIcon className="h-3.5 w-3.5" />
+          </button>
+        )}
         <InheritanceTooltip inheritedFrom={inheritedFrom} />
       </div>
       <div className="text-gray-500 text-sm flex flex-col items-start">
