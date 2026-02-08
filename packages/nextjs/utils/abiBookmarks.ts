@@ -82,7 +82,7 @@ export function removeFunctionFromBookmark(chainId: number, address: string, abi
   const entryStr = JSON.stringify(abiEntry);
   const updatedAbi = existing.abi.filter(entry => JSON.stringify(entry) !== entryStr);
 
-  if (updatedAbi.length === 0) {
+  if (updatedAbi.length === 0 && !existing.label) {
     removeAbiBookmark(chainId, address);
   } else {
     saveAbiBookmark(chainId, address, updatedAbi as Abi, existing.label);
@@ -94,6 +94,29 @@ export function removeAbiBookmark(chainId: number, address: string): void {
   const bookmarks = getAllBookmarks();
   const key = getStorageKey(chainId, address);
   delete bookmarks[key];
+  saveAllBookmarks(bookmarks);
+}
+
+export function updateBookmarkLabel(chainId: number, address: string, label: string | undefined): void {
+  const bookmarks = getAllBookmarks();
+  const key = getStorageKey(chainId, address);
+  const existing = bookmarks[key];
+  if (!existing) {
+    if (!label) return;
+    bookmarks[key] = {
+      chainId,
+      address: address.toLowerCase(),
+      abi: [] as unknown as Abi,
+      label,
+      updatedAt: Date.now(),
+    };
+  } else {
+    existing.label = label || undefined;
+    existing.updatedAt = Date.now();
+    if (!existing.label && existing.abi.length === 0) {
+      delete bookmarks[key];
+    }
+  }
   saveAllBookmarks(bookmarks);
 }
 

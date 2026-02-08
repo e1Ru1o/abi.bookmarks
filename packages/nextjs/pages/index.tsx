@@ -26,6 +26,7 @@ const Home: NextPage = () => {
   const [contractAddress, setContractAddress] = useState("");
   const [bookmarks, setBookmarks] = useState<AbiBookmark[]>([]);
   const [recentContracts, setRecentContracts] = useState<RecentContract[]>([]);
+  const [showAllBookmarks, setShowAllBookmarks] = useState(false);
 
   const router = useRouter();
 
@@ -98,7 +99,7 @@ const Home: NextPage = () => {
                       href={`/${rc.address}/${rc.chainId}`}
                       className="badge badge-outline badge-lg gap-1 no-underline hover:bg-primary hover:text-primary-content transition-colors"
                     >
-                      <span className="font-mono text-xs">{truncateAddress(rc.address)}</span>
+                      <span className="font-mono text-xs">{rc.label || truncateAddress(rc.address)}</span>
                       <span className="text-xs opacity-60">{getNetworkName(rc.chainId)}</span>
                     </Link>
                   ))}
@@ -113,17 +114,22 @@ const Home: NextPage = () => {
                   <span className="font-semibold text-sm">Saved ABIs</span>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  {bookmarks.slice(0, 5).map(bm => (
+                  {(showAllBookmarks ? bookmarks : bookmarks.slice(0, 5)).map(bm => (
                     <div
                       key={`${bm.chainId}:${bm.address}`}
                       className="flex items-center gap-2 bg-base-300 rounded-lg px-3 py-2"
                     >
                       <Link
                         href={`/${bm.address}/${bm.chainId}`}
-                        className="flex-grow flex justify-between items-center no-underline text-base-content hover:text-primary transition-colors"
+                        className="flex-grow flex justify-between items-center no-underline text-base-content hover:text-primary transition-colors min-w-0"
                       >
-                        <span className="font-mono text-sm">{truncateAddress(bm.address)}</span>
-                        <span className="text-xs text-base-content/60">{getNetworkName(bm.chainId)}</span>
+                        <div className="flex flex-col min-w-0">
+                          {bm.label && <span className="text-sm font-medium truncate">{bm.label}</span>}
+                          <span className="font-mono text-xs text-base-content/60 truncate">
+                            {truncateAddress(bm.address)}
+                          </span>
+                        </div>
+                        <span className="text-xs text-base-content/60 shrink-0 ml-2">{getNetworkName(bm.chainId)}</span>
                       </Link>
                       <button
                         className="btn btn-ghost btn-xs px-1"
@@ -135,6 +141,14 @@ const Home: NextPage = () => {
                     </div>
                   ))}
                 </div>
+                {bookmarks.length > 5 && (
+                  <button
+                    className="btn btn-ghost btn-xs mt-2 text-base-content/60"
+                    onClick={() => setShowAllBookmarks(!showAllBookmarks)}
+                  >
+                    {showAllBookmarks ? "Show less" : `Show more (${bookmarks.length - 5})`}
+                  </button>
+                )}
               </div>
             )}
           </div>

@@ -7,7 +7,7 @@ import { CustomCallForm } from "./CustomCallForm";
 import { AbiFunction } from "abitype";
 import { Abi, Address as AddressType } from "viem";
 import { useContractRead } from "wagmi";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { MiniFooter } from "~~/components/MiniFooter";
 import { Address, Balance, MethodSelector } from "~~/components/scaffold-eth";
 import { useNetworkColor } from "~~/hooks/scaffold-eth";
@@ -19,6 +19,8 @@ type ContractUIProps = {
   initialContractData: { address: AddressType; abi: Abi };
   onAddFunctions?: () => void;
   onRemoveFromAbi?: (abiFunction: AbiFunction) => void;
+  contractLabel?: string;
+  onLabelChange?: (label: string) => void;
 };
 
 export interface AugmentedAbiFunction extends AbiFunction {
@@ -64,7 +66,11 @@ export const ContractUI = ({
   initialContractData,
   onAddFunctions,
   onRemoveFromAbi,
+  contractLabel,
+  onLabelChange,
 }: ContractUIProps) => {
+  const [isEditingLabel, setIsEditingLabel] = useState(false);
+  const [labelDraft, setLabelDraft] = useState(contractLabel || "");
   const [refreshDisplayVariables, triggerRefreshDisplayVariables] = useReducer(value => !value, false);
   const [showCustomCall, setShowCustomCall] = useState(false);
   const { chainId } = useGlobalState(state => ({
@@ -142,6 +148,12 @@ export const ContractUI = ({
     }
     return "Contract";
   }, [isContractNameLoading, contractNameData]);
+
+  useEffect(() => {
+    if (!contractLabel && contractNameData && typeof contractNameData === "string") {
+      onLabelChange?.(contractNameData);
+    }
+  }, [contractNameData, contractLabel]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="drawer sm:drawer-open h-full">
@@ -232,8 +244,47 @@ export const ContractUI = ({
                 <div className="flex">
                   <div className="flex flex-col gap-1">
                     <span className="font-bold pb-2">Contract Overview</span>
-                    <div className="flex pb-1">
-                      <span className="font-medium text-base mr-4"> {displayContractName} </span>
+                    <div className="flex items-center pb-1 gap-1">
+                      {isEditingLabel ? (
+                        <input
+                          className="input input-sm input-bordered font-medium text-base w-48"
+                          value={labelDraft}
+                          onChange={e => setLabelDraft(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === "Enter") {
+                              onLabelChange?.(labelDraft.trim());
+                              setIsEditingLabel(false);
+                            }
+                            if (e.key === "Escape") {
+                              setLabelDraft(contractLabel || "");
+                              setIsEditingLabel(false);
+                            }
+                          }}
+                          onBlur={() => {
+                            onLabelChange?.(labelDraft.trim());
+                            setIsEditingLabel(false);
+                          }}
+                          autoFocus
+                          maxLength={40}
+                          placeholder={displayContractName}
+                        />
+                      ) : (
+                        <>
+                          <span className="font-medium text-base">{contractLabel || displayContractName}</span>
+                          {onLabelChange && (
+                            <button
+                              className="btn btn-ghost btn-xs px-1"
+                              onClick={() => {
+                                setLabelDraft(contractLabel || "");
+                                setIsEditingLabel(true);
+                              }}
+                              aria-label="Edit contract label"
+                            >
+                              <PencilSquareIcon className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                        </>
+                      )}
                       <Address address={initialContractData.address} />
                     </div>
                     <div className="flex items-center gap-1">
@@ -249,12 +300,6 @@ export const ContractUI = ({
                       {mainNetwork.id == 31337 ? "Localhost" : mainNetwork.name}
                     </span>
                   </p>
-                )}
-                {onAddFunctions && (
-                  <button className="btn btn-outline btn-sm mt-2 gap-1" onClick={onAddFunctions}>
-                    <PlusIcon className="h-4 w-4" />
-                    Add Functions
-                  </button>
                 )}
               </div>
               <div className="bg-base-200 shadow-xl rounded-2xl px-6 py-4">
