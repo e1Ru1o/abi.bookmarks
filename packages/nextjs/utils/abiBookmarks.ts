@@ -2,7 +2,7 @@ import { Abi } from "viem";
 
 const ABI_STORAGE_KEY = "abi-bookmarks";
 const RECENT_CONTRACTS_KEY = "abi-bookmarks-recent";
-const MAX_RECENT = 10;
+const MAX_RECENT = 6;
 
 export type AbiBookmark = {
   chainId: number;
