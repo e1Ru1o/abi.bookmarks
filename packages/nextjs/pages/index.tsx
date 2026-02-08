@@ -26,6 +26,7 @@ const Home: NextPage = () => {
   const [contractAddress, setContractAddress] = useState("");
   const [bookmarks, setBookmarks] = useState<AbiBookmark[]>([]);
   const [recentContracts, setRecentContracts] = useState<RecentContract[]>([]);
+  const [showAllBookmarks, setShowAllBookmarks] = useState(false);
 
   const router = useRouter();
 
@@ -113,7 +114,7 @@ const Home: NextPage = () => {
                   <span className="font-semibold text-sm">Saved ABIs</span>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  {bookmarks.slice(0, 5).map(bm => (
+                  {(showAllBookmarks ? bookmarks : bookmarks.slice(0, 5)).map(bm => (
                     <div
                       key={`${bm.chainId}:${bm.address}`}
                       className="flex items-center gap-2 bg-base-300 rounded-lg px-3 py-2"
@@ -140,6 +141,14 @@ const Home: NextPage = () => {
                     </div>
                   ))}
                 </div>
+                {bookmarks.length > 5 && (
+                  <button
+                    className="btn btn-ghost btn-xs mt-2 text-base-content/60"
+                    onClick={() => setShowAllBookmarks(!showAllBookmarks)}
+                  >
+                    {showAllBookmarks ? "Show less" : `Show more (${bookmarks.length - 5})`}
+                  </button>
+                )}
               </div>
             )}
           </div>

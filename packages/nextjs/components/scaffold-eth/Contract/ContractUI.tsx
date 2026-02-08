@@ -149,6 +149,12 @@ export const ContractUI = ({
     return "Contract";
   }, [isContractNameLoading, contractNameData]);
 
+  useEffect(() => {
+    if (!contractLabel && contractNameData && typeof contractNameData === "string") {
+      onLabelChange?.(contractNameData);
+    }
+  }, [contractNameData]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div className="drawer sm:drawer-open h-full">
       <input id="sidebar" type="checkbox" className="drawer-toggle" />
