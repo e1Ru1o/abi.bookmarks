@@ -123,14 +123,26 @@ export const CustomCallForm = ({ contractAddress, onClose }: CustomCallFormProps
       </div>
 
       {readResult && (
-        <div className="bg-secondary rounded-3xl text-sm px-4 py-1.5 break-words overflow-auto">
+        <div className="bg-secondary rounded-lg text-sm px-4 py-1.5 break-words overflow-auto w-full relative">
+          <button
+            className="absolute top-1 right-1 hover:bg-base-100/20 rounded-md p-0.5 text-secondary-content/60 hover:text-secondary-content"
+            onClick={() => setReadResult("")}
+          >
+            <XMarkIcon className="h-4 w-4" />
+          </button>
           <p className="font-bold m-0 mb-1">Result:</p>
           <pre className="whitespace-pre-wrap break-words font-mono text-xs">{readResult}</pre>
         </div>
       )}
 
       {displayedTxResult && (
-        <div className="flex-grow basis-0">
+        <div className="flex-grow basis-0 w-full relative">
+          <button
+            className="absolute top-1 right-1 z-10 hover:bg-base-100/20 rounded-md p-0.5 text-secondary-content/60 hover:text-secondary-content"
+            onClick={() => setDisplayedTxResult(undefined)}
+          >
+            <XMarkIcon className="h-4 w-4" />
+          </button>
           <TxReceipt txResult={displayedTxResult} />
         </div>
       )}

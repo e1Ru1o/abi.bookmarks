@@ -97,43 +97,47 @@ export const ReadOnlyFunctionForm = ({
         <InheritanceTooltip inheritedFrom={inheritedFrom} />
       </p>
       {inputElements}
-      <div className="flex justify-end gap-1">
-        <div className="tooltip tooltip-left" data-tip="Copy Calldata">
-          <button className="btn btn-ghost btn-sm" onClick={handleCopyCalldata}>
-            {calldataCopied ? (
-              <CheckCircleIcon
-                className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer"
-                aria-hidden="true"
-              />
-            ) : (
-              <DocumentDuplicateIcon className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer" />
-            )}
-          </button>
+      <div className="flex flex-col md:flex-row justify-between gap-2 flex-wrap">
+        <div className="flex-grow w-full">
+          {result !== null && result !== undefined && (
+            <div className="bg-secondary rounded-lg text-sm px-4 py-1.5 break-words overflow-auto relative">
+              <button
+                className="absolute top-1 right-1 hover:bg-base-100/20 rounded-md p-0.5 text-secondary-content/60 hover:text-secondary-content"
+                onClick={() => setResult(undefined)}
+              >
+                <XMarkIcon className="h-4 w-4" />
+              </button>
+              <p className="font-bold m-0 mb-1">Result:</p>
+              <pre className="whitespace-pre-wrap break-words">{displayTxResult(result, "sm")}</pre>
+            </div>
+          )}
         </div>
-        <button
-          className="btn btn-secondary btn-sm"
-          onClick={async () => {
-            const { data } = await refetch();
-            setResult(data);
-          }}
-          disabled={isFetching}
-        >
-          {isFetching && <span className="loading loading-spinner loading-xs"></span>}
-          Read 📡
-        </button>
-      </div>
-      {result !== null && result !== undefined && (
-        <div className="bg-secondary rounded-3xl text-sm px-4 py-1.5 break-words overflow-auto w-full relative">
+        <div className="flex gap-1 self-end md:self-start">
           <button
-            className="absolute top-1.5 right-2 text-secondary-content/60 hover:text-secondary-content"
-            onClick={() => setResult(undefined)}
+            className="btn btn-secondary btn-sm"
+            onClick={async () => {
+              const { data } = await refetch();
+              setResult(data);
+            }}
+            disabled={isFetching}
           >
-            <XMarkIcon className="h-4 w-4" />
+            {isFetching && <span className="loading loading-spinner loading-xs"></span>}
+            Read 📡
           </button>
-          <p className="font-bold m-0 mb-1">Result:</p>
-          <pre className="whitespace-pre-wrap break-words">{displayTxResult(result, "sm")}</pre>
+          <div className="tooltip tooltip-left" data-tip="Copy Calldata">
+            <button className="btn btn-ghost btn-sm" onClick={handleCopyCalldata}>
+              {calldataCopied ? (
+                <CheckCircleIcon
+                  className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer"
+                  aria-hidden="true"
+                />
+              ) : (
+                <DocumentDuplicateIcon className="h-5 w-5 text-xl font-normal text-secondary-content cursor-pointer" />
+              )}
+            </button>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
