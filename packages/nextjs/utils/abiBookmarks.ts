@@ -82,7 +82,7 @@ export function removeFunctionFromBookmark(chainId: number, address: string, abi
   const entryStr = JSON.stringify(abiEntry);
   const updatedAbi = existing.abi.filter(entry => JSON.stringify(entry) !== entryStr);
 
-  if (updatedAbi.length === 0) {
+  if (updatedAbi.length === 0 && !existing.label) {
     removeAbiBookmark(chainId, address);
   } else {
     saveAbiBookmark(chainId, address, updatedAbi as Abi, existing.label);
