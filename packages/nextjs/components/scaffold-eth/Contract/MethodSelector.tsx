@@ -1,6 +1,13 @@
 import { type KeyboardEvent, useState } from "react";
 import { AugmentedAbiFunction } from "./ContractUI";
-import { ChevronDownIcon, ChevronRightIcon, CommandLineIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronDownIcon,
+  ChevronRightIcon,
+  CommandLineIcon,
+  MinusIcon,
+  PlusIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 
 type MethodSelectorProps = {
   readMethodsWithInputsAndWriteMethods: AugmentedAbiFunction[];
@@ -10,6 +17,7 @@ type MethodSelectorProps = {
   showCustomCall?: boolean;
   onToggleCustomCall?: () => void;
   onAddFunctions?: () => void;
+  onRemoveFromAbi?: (uid: string) => void;
 };
 
 export const MethodSelector = ({
@@ -20,6 +28,7 @@ export const MethodSelector = ({
   showCustomCall,
   onToggleCustomCall,
   onAddFunctions,
+  onRemoveFromAbi,
 }: MethodSelectorProps) => {
   const [isReadCollapsed, setIsReadCollapsed] = useState(false);
   const [isWriteCollapsed, setIsWriteCollapsed] = useState(false);
@@ -75,11 +84,25 @@ export const MethodSelector = ({
         {!isReadCollapsed && (
           <div className="flex flex-col items-start gap-1 pb-4">
             {readMethods.map(method => (
-              <div key={method.uid} className="flex items-center gap-2 w-full pr-4">
+              <div
+                key={method.uid}
+                className={`flex items-center gap-1 w-full pr-4 rounded-lg ${
+                  onRemoveFromAbi ? "[&:has(.remove-btn:hover)]:bg-error/10" : ""
+                }`}
+              >
+                {onRemoveFromAbi && (
+                  <button
+                    className="remove-btn btn btn-ghost btn-xs px-0.5 text-base-content/40 hover:text-error"
+                    onClick={() => onRemoveFromAbi(method.uid)}
+                    aria-label={`Remove ${method.name} from ABI`}
+                  >
+                    <MinusIcon className="h-3.5 w-3.5" />
+                  </button>
+                )}
                 <div
                   role="button"
                   tabIndex={0}
-                  className={`btn btn-sm btn-ghost font-normal pr-1 w-full justify-between ${
+                  className={`btn btn-sm btn-ghost font-normal pr-1 flex-1 justify-between ${
                     isMethodSelected(method.uid) ? "bg-neutral pointer-events-none" : ""
                   }`}
                   onClick={() => {
@@ -122,12 +145,26 @@ export const MethodSelector = ({
         </h3>
         {!isWriteCollapsed && (
           <div className="flex flex-col items-start gap-1 pb-4">
-            {writeMethods.map((method, index) => (
-              <div key={index} className="flex items-center gap-2 w-full pr-4">
+            {writeMethods.map(method => (
+              <div
+                key={method.uid}
+                className={`flex items-center gap-1 w-full pr-4 rounded-lg ${
+                  onRemoveFromAbi ? "[&:has(.remove-btn:hover)]:bg-error/10" : ""
+                }`}
+              >
+                {onRemoveFromAbi && (
+                  <button
+                    className="remove-btn btn btn-ghost btn-xs px-0.5 text-base-content/40 hover:text-error"
+                    onClick={() => onRemoveFromAbi(method.uid)}
+                    aria-label={`Remove ${method.name} from ABI`}
+                  >
+                    <MinusIcon className="h-3.5 w-3.5" />
+                  </button>
+                )}
                 <div
                   role="button"
                   tabIndex={0}
-                  className={`btn btn-sm btn-ghost font-normal pr-1 w-full justify-between ${
+                  className={`btn btn-sm btn-ghost font-normal pr-1 flex-1 justify-between ${
                     isMethodSelected(method.uid) ? "bg-neutral pointer-events-none" : ""
                   }`}
                   onKeyDown={event => callOnMethodSelectOnSpaceOrEnter(event, method.uid)}

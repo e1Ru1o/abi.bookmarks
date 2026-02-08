@@ -1,8 +1,8 @@
 // @ts-check
 // eslint-disable-next-line @typescript-eslint/no-var-requires
+import { withPlausibleProxy } from "next-plausible";
 import path from "path";
 import { fileURLToPath } from "url";
-import { withPlausibleProxy } from "next-plausible";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
