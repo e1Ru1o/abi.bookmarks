@@ -101,9 +101,23 @@ export function updateBookmarkLabel(chainId: number, address: string, label: str
   const bookmarks = getAllBookmarks();
   const key = getStorageKey(chainId, address);
   const existing = bookmarks[key];
-  if (!existing) return;
-  existing.label = label || undefined;
-  existing.updatedAt = Date.now();
+  const normalizedLabel = label || undefined;
+  if (!existing) {
+    if (!normalizedLabel) return;
+    bookmarks[key] = {
+      chainId,
+      address: address.toLowerCase(),
+      abi: [] as unknown as Abi,
+      label: normalizedLabel,
+      updatedAt: Date.now(),
+    };
+  } else {
+    existing.label = normalizedLabel;
+    existing.updatedAt = Date.now();
+    if (!normalizedLabel && existing.abi.length === 0) {
+      delete bookmarks[key];
+    }
+  }
   saveAllBookmarks(bookmarks);
 }
 
