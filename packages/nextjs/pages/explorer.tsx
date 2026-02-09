@@ -277,33 +277,28 @@ const ExplorerPage = () => {
       <MetaHeader />
       <div className="bg-base-100 h-screen flex flex-col">
         <MiniHeader />
-        <div className="flex flex-grow h-full overflow-hidden">
-          {/* Sidebar */}
-          <div className="hidden sm:flex w-72 shrink-0 bg-base-200 border-r border-base-300">
-            <ExplorerSidebar
-              contracts={openContracts}
-              activeContractId={activeContractId}
-              onActivate={handleActivateContract}
-              onClose={handleCloseContract}
-              onMethodSelect={handleMethodSelect}
-              onMethodRemove={handleMethodRemove}
-              onToggleCustomCall={handleToggleCustomCall}
-              onAddFunctions={handleAddFunctions}
-              onRemoveFromAbi={handleRemoveFromAbiSidebar}
-              onOpenAddPopup={() => setShowAddPopup(true)}
-            />
+        <div className="drawer sm:drawer-open flex-grow h-full overflow-hidden">
+          <input id="sidebar" type="checkbox" className="drawer-toggle" />
+          <div className="drawer-side z-30 h-full">
+            <label htmlFor="sidebar" aria-label="close sidebar" className="drawer-overlay"></label>
+            <div className="w-72 bg-base-200 h-full border-r border-base-300">
+              <ExplorerSidebar
+                contracts={openContracts}
+                activeContractId={activeContractId}
+                onActivate={handleActivateContract}
+                onClose={handleCloseContract}
+                onMethodSelect={handleMethodSelect}
+                onMethodRemove={handleMethodRemove}
+                onToggleCustomCall={handleToggleCustomCall}
+                onAddFunctions={handleAddFunctions}
+                onRemoveFromAbi={handleRemoveFromAbiSidebar}
+                onOpenAddPopup={() => setShowAddPopup(true)}
+              />
+            </div>
           </div>
 
-          {/* Mobile: floating add button */}
-          <button
-            className="sm:hidden fixed bottom-20 right-6 z-40 btn btn-primary btn-circle shadow-lg"
-            onClick={() => setShowAddPopup(true)}
-          >
-            <PlusIcon className="h-6 w-6" />
-          </button>
-
           {/* Main content */}
-          <div className="flex-grow overflow-hidden">
+          <div className="drawer-content overflow-hidden">
             {activeContract && (
               <ExplorerMainContent
                 key={activeContract.id}
