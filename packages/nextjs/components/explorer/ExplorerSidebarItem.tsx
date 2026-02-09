@@ -56,7 +56,7 @@ export const ExplorerSidebarItem = ({
   if (!isActive) {
     return (
       <div
-        className="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-base-300 transition-colors"
+        className="shrink-0 flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-base-300 transition-colors"
         onClick={onActivate}
       >
         <div className="flex items-center gap-2 min-w-0">
@@ -81,7 +81,7 @@ export const ExplorerSidebarItem = ({
   }
 
   return (
-    <div className="rounded-lg bg-base-300/50 overflow-hidden">
+    <div className="shrink-0 rounded-lg bg-base-300/50">
       <div className="flex items-center justify-between px-3 py-2 bg-primary/10">
         <div className="flex items-center gap-2 min-w-0">
           <ChevronDownIcon className="h-4 w-4 shrink-0 text-primary" />
@@ -96,7 +96,7 @@ export const ExplorerSidebarItem = ({
       </div>
       <div className="px-2 py-2">
         <MethodSelector
-          className="overflow-auto max-h-[50vh]"
+          className="overflow-hidden"
           showCloseButton={false}
           readMethodsWithInputsAndWriteMethods={readMethodsWithInputsAndWriteMethods}
           abi={selectedMethods}

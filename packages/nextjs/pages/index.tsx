@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import type { NextPage } from "next";
 import { isAddress } from "viem";
@@ -15,9 +14,12 @@ import { useGlobalState } from "~~/services/store/store";
 import {
   AbiBookmark,
   RecentContract,
+  addOpenContract,
   getAllBookmarksList,
+  getOpenContracts,
   getRecentContractsList,
   removeAbiBookmark,
+  saveOpenContracts,
 } from "~~/utils/abiBookmarks";
 import { notification } from "~~/utils/scaffold-eth";
 
@@ -27,12 +29,15 @@ const Home: NextPage = () => {
   const [bookmarks, setBookmarks] = useState<AbiBookmark[]>([]);
   const [recentContracts, setRecentContracts] = useState<RecentContract[]>([]);
   const [showAllBookmarks, setShowAllBookmarks] = useState(false);
+  const [hasOpenSession, setHasOpenSession] = useState(false);
 
   const router = useRouter();
 
   useEffect(() => {
     setBookmarks(getAllBookmarksList());
     setRecentContracts(getRecentContractsList());
+    const { contracts } = getOpenContracts();
+    setHasOpenSession(contracts.length > 0);
   }, []);
 
   const handleGo = () => {
@@ -40,7 +45,8 @@ const Home: NextPage = () => {
       notification.error("Please enter a valid contract address.");
       return;
     }
-    router.push(`/${contractAddress}/${network}`);
+    addOpenContract(parseInt(network), contractAddress);
+    router.push("/explorer");
   };
 
   const handleRemoveBookmark = (chainId: number, address: string) => {
@@ -89,19 +95,42 @@ const Home: NextPage = () => {
               </button>
             </div>
 
+            {hasOpenSession && (
+              <div className="w-full max-w-sm mt-8 bg-primary/10 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+                <span className="text-sm">Recover your last explorer session?</span>
+                <div className="flex gap-2 shrink-0">
+                  <button
+                    className="btn btn-ghost btn-xs"
+                    onClick={() => {
+                      saveOpenContracts([], null);
+                      setHasOpenSession(false);
+                    }}
+                  >
+                    Dismiss
+                  </button>
+                  <button className="btn btn-primary btn-xs" onClick={() => router.push("/explorer")}>
+                    Recover
+                  </button>
+                </div>
+              </div>
+            )}
+
             {recentContracts.length > 0 && (
               <div className="w-full max-w-sm mt-10">
                 <span className="font-semibold text-sm mb-3 block">Recent</span>
                 <div className="flex flex-wrap gap-2">
                   {recentContracts.slice(0, 6).map(rc => (
-                    <Link
+                    <button
                       key={`${rc.chainId}:${rc.address}`}
-                      href={`/${rc.address}/${rc.chainId}`}
-                      className="badge badge-outline badge-lg gap-1 no-underline hover:bg-primary hover:text-primary-content transition-colors"
+                      className="badge badge-outline badge-lg gap-1 hover:bg-primary hover:text-primary-content transition-colors cursor-pointer"
+                      onClick={() => {
+                        addOpenContract(rc.chainId, rc.address);
+                        router.push("/explorer");
+                      }}
                     >
                       <span className="font-mono text-xs">{rc.label || truncateAddress(rc.address)}</span>
                       <span className="text-xs opacity-60">{getNetworkName(rc.chainId)}</span>
-                    </Link>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -119,9 +148,12 @@ const Home: NextPage = () => {
                       key={`${bm.chainId}:${bm.address}`}
                       className="flex items-center gap-2 bg-base-300 rounded-lg px-3 py-2"
                     >
-                      <Link
-                        href={`/${bm.address}/${bm.chainId}`}
-                        className="flex-grow flex justify-between items-center no-underline text-base-content hover:text-primary transition-colors min-w-0"
+                      <button
+                        className="flex-grow flex justify-between items-center text-base-content hover:text-primary transition-colors min-w-0 text-left"
+                        onClick={() => {
+                          addOpenContract(bm.chainId, bm.address);
+                          router.push("/explorer");
+                        }}
                       >
                         <div className="flex flex-col min-w-0">
                           {bm.label && <span className="text-sm font-medium truncate">{bm.label}</span>}
@@ -130,7 +162,7 @@ const Home: NextPage = () => {
                           </span>
                         </div>
                         <span className="text-xs text-base-content/60 shrink-0 ml-2">{getNetworkName(bm.chainId)}</span>
-                      </Link>
+                      </button>
                       <button
                         className="btn btn-ghost btn-xs px-1"
                         onClick={() => handleRemoveBookmark(bm.chainId, bm.address)}
