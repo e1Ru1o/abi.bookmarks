@@ -157,3 +157,36 @@ export function addRecentContract(chainId: number, address: string, label?: stri
 export function getRecentContractsList(): RecentContract[] {
   return getRecentContracts();
 }
+
+// Open explorer contracts
+const OPEN_CONTRACTS_KEY = "abi-bookmarks-open";
+
+export type OpenContractEntry = {
+  chainId: number;
+  address: string;
+};
+
+export function getOpenContracts(): { contracts: OpenContractEntry[]; activeId: string | null } {
+  if (typeof window === "undefined") return { contracts: [], activeId: null };
+  try {
+    const raw = localStorage.getItem(OPEN_CONTRACTS_KEY);
+    if (!raw) return { contracts: [], activeId: null };
+    return JSON.parse(raw);
+  } catch {
+    return { contracts: [], activeId: null };
+  }
+}
+
+export function saveOpenContracts(contracts: OpenContractEntry[], activeId: string | null): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(OPEN_CONTRACTS_KEY, JSON.stringify({ contracts, activeId }));
+}
+
+export function addOpenContract(chainId: number, address: string): void {
+  const { contracts } = getOpenContracts();
+  const id = `${chainId}:${address.toLowerCase()}`;
+  if (!contracts.some(c => `${c.chainId}:${c.address.toLowerCase()}` === id)) {
+    contracts.push({ chainId, address: address.toLowerCase() });
+  }
+  saveOpenContracts(contracts, id);
+}

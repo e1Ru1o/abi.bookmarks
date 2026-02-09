@@ -18,6 +18,8 @@ type MethodSelectorProps = {
   onToggleCustomCall?: () => void;
   onAddFunctions?: () => void;
   onRemoveFromAbi?: (uid: string) => void;
+  className?: string;
+  showCloseButton?: boolean;
 };
 
 export const MethodSelector = ({
@@ -29,6 +31,8 @@ export const MethodSelector = ({
   onToggleCustomCall,
   onAddFunctions,
   onRemoveFromAbi,
+  className = "overflow-auto h-[80vh]",
+  showCloseButton = true,
 }: MethodSelectorProps) => {
   const [isReadCollapsed, setIsReadCollapsed] = useState(false);
   const [isWriteCollapsed, setIsWriteCollapsed] = useState(false);
@@ -54,11 +58,15 @@ export const MethodSelector = ({
   };
 
   return (
-    <div className="overflow-auto h-[80vh]">
-      <input id="sidebar" type="checkbox" className="drawer-toggle" />
-      <label htmlFor="sidebar" className="cursor-pointer block sm:hidden">
-        <XMarkIcon className="h-5 w-5 mb-5 hover:opacity-70" />
-      </label>
+    <div className={className}>
+      {showCloseButton && (
+        <>
+          <input id="sidebar" type="checkbox" className="drawer-toggle" />
+          <label htmlFor="sidebar" className="cursor-pointer block sm:hidden">
+            <XMarkIcon className="h-5 w-5 mb-5 hover:opacity-70" />
+          </label>
+        </>
+      )}
 
       {onAddFunctions && (
         <button className="btn btn-outline btn-sm w-full mb-4 gap-1" onClick={onAddFunctions}>

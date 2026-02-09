@@ -27,7 +27,7 @@ export interface AugmentedAbiFunction extends AbiFunction {
   uid: string;
 }
 
-const augmentMethodsWithUid = (methods: AbiFunction[]): AugmentedAbiFunction[] => {
+export const augmentMethodsWithUid = (methods: AbiFunction[]): AugmentedAbiFunction[] => {
   const methodsByName: Record<string, AbiFunction[]> = {};
   methods.forEach(method => {
     if (!methodsByName[method.name]) {

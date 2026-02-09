@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
   const pathSegments = pathname.split("/").filter(Boolean);
 
   if (pathSegments.length === 1 && addressRegex.test(pathSegments[0])) {
-    const newURL = new URL(`/${pathSegments[0]}/1`, request.url);
+    const newURL = new URL(`/explorer?add=1:${pathSegments[0]}`, request.url);
     return NextResponse.redirect(newURL);
   }
 
