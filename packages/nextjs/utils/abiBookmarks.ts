@@ -166,6 +166,25 @@ export type OpenContractEntry = {
   address: string;
 };
 
+// Workspaces
+const WORKSPACES_KEY = "abi-bookmarks-workspaces";
+
+export type WorkspaceEntry = {
+  address: string;
+  chainId: number;
+};
+
+export type Workspace = {
+  id: number;
+  name: string;
+  contracts: WorkspaceEntry[];
+};
+
+export type WorkspacesData = {
+  nextId: number;
+  workspaces: Workspace[];
+};
+
 export function getOpenContracts(): { contracts: OpenContractEntry[]; activeId: string | null } {
   if (typeof window === "undefined") return { contracts: [], activeId: null };
   try {
@@ -189,4 +208,60 @@ export function addOpenContract(chainId: number, address: string): void {
     contracts.push({ chainId, address: address.toLowerCase() });
   }
   saveOpenContracts(contracts, id);
+}
+
+// Workspace CRUD
+
+export function getWorkspacesData(): WorkspacesData {
+  if (typeof window === "undefined") return { nextId: 1, workspaces: [] };
+  try {
+    const raw = localStorage.getItem(WORKSPACES_KEY);
+    if (!raw) return { nextId: 1, workspaces: [] };
+    return JSON.parse(raw);
+  } catch {
+    return { nextId: 1, workspaces: [] };
+  }
+}
+
+export function saveWorkspacesData(data: WorkspacesData): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(WORKSPACES_KEY, JSON.stringify(data));
+}
+
+export function createWorkspace(name: string, contracts: WorkspaceEntry[] = []): Workspace {
+  const data = getWorkspacesData();
+  const workspace: Workspace = { id: data.nextId, name, contracts };
+  data.workspaces.push(workspace);
+  data.nextId++;
+  saveWorkspacesData(data);
+  return workspace;
+}
+
+export function deleteWorkspace(id: number): void {
+  const data = getWorkspacesData();
+  data.workspaces = data.workspaces.filter(w => w.id !== id);
+  saveWorkspacesData(data);
+}
+
+export function renameWorkspace(id: number, name: string): void {
+  const data = getWorkspacesData();
+  const ws = data.workspaces.find(w => w.id === id);
+  if (ws) {
+    ws.name = name;
+    saveWorkspacesData(data);
+  }
+}
+
+export function getWorkspaceById(id: number): Workspace | null {
+  const data = getWorkspacesData();
+  return data.workspaces.find(w => w.id === id) || null;
+}
+
+export function saveWorkspaceContracts(id: number, contracts: WorkspaceEntry[]): void {
+  const data = getWorkspacesData();
+  const ws = data.workspaces.find(w => w.id === id);
+  if (ws) {
+    ws.contracts = contracts;
+    saveWorkspacesData(data);
+  }
 }

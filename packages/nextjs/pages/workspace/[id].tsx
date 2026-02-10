@@ -16,12 +16,12 @@ import { parseAndCorrectJSON } from "~~/utils/abi";
 import {
   addRecentContract,
   appendAbiToBookmark,
-  createWorkspace,
   getBookmarkedAbi,
-  getOpenContracts,
+  getWorkspaceById,
   removeFunctionFromBookmark,
+  renameWorkspace,
   saveAbiBookmark,
-  saveOpenContracts,
+  saveWorkspaceContracts,
   updateBookmarkLabel,
 } from "~~/utils/abiBookmarks";
 import { notification } from "~~/utils/scaffold-eth";
@@ -46,9 +46,11 @@ function loadContract(chainId: number, address: Address): ExplorerContract {
   };
 }
 
-const ExplorerPage = () => {
+const WorkspacePage = () => {
   const router = useRouter();
+  const workspaceId = parseInt(router.query.id as string);
 
+  const [workspaceName, setWorkspaceName] = useState("");
   const [openContracts, setOpenContracts] = useState<ExplorerContract[]>([]);
   const [activeContractId, setActiveContractId] = useState<string>("");
   const [showAddPopup, setShowAddPopup] = useState(false);
@@ -63,32 +65,42 @@ const ExplorerPage = () => {
 
   const initializedRef = useRef(false);
 
-  // Load contracts from localStorage on mount
+  // Load workspace from localStorage on mount
   useEffect(() => {
     if (!router.isReady || initializedRef.current) return;
     initializedRef.current = true;
 
-    const { contracts: saved, activeId } = getOpenContracts();
-    if (saved.length === 0) {
+    const ws = getWorkspaceById(workspaceId);
+    if (!ws) {
       router.replace("/");
       return;
     }
 
-    const contracts = saved.map(e => loadContract(e.chainId, e.address as Address));
-    const resolvedActiveId = activeId && contracts.find(c => c.id === activeId) ? activeId : contracts[0].id;
+    setWorkspaceName(ws.name);
 
+    if (ws.contracts.length === 0) {
+      setOpenContracts([]);
+      setActiveContractId("");
+      setIsLoaded(true);
+      return;
+    }
+
+    const contracts = ws.contracts.map(e => loadContract(e.chainId, e.address as Address));
     setOpenContracts(contracts);
-    setActiveContractId(resolvedActiveId);
+    setActiveContractId(contracts[0].id);
     setIsLoaded(true);
-  }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [router.isReady, workspaceId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Persist to localStorage when contracts or active changes
-  const persistState = useCallback((contracts: ExplorerContract[], activeId: string) => {
-    saveOpenContracts(
-      contracts.map(c => ({ chainId: c.chainId, address: c.address })),
-      activeId,
-    );
-  }, []);
+  // Persist workspace contracts when they change
+  const persistState = useCallback(
+    (contracts: ExplorerContract[]) => {
+      saveWorkspaceContracts(
+        workspaceId,
+        contracts.map(c => ({ chainId: c.chainId, address: c.address })),
+      );
+    },
+    [workspaceId],
+  );
 
   // Sync target network when active contract changes
   useEffect(() => {
@@ -116,7 +128,7 @@ const ExplorerPage = () => {
     const existing = openContracts.find(c => c.id === id);
     if (existing) {
       setActiveContractId(id);
-      persistState(openContracts, id);
+      persistState(openContracts);
       setShowAddPopup(false);
       return;
     }
@@ -125,26 +137,22 @@ const ExplorerPage = () => {
     const updated = [...openContracts, contract];
     setOpenContracts(updated);
     setActiveContractId(contract.id);
-    persistState(updated, contract.id);
+    persistState(updated);
     setShowAddPopup(false);
   };
 
   const handleCloseContract = (contractId: string) => {
     const remaining = openContracts.filter(c => c.id !== contractId);
-    if (remaining.length === 0) {
-      saveOpenContracts([], null);
-      router.push("/");
-      return;
-    }
-    const newActive = activeContractId === contractId ? remaining[0].id : activeContractId;
+    const newActive =
+      remaining.length === 0 ? "" : activeContractId === contractId ? remaining[0].id : activeContractId;
     setOpenContracts(remaining);
     setActiveContractId(newActive);
-    persistState(remaining, newActive);
+    persistState(remaining);
   };
 
   const handleActivateContract = (contractId: string) => {
     setActiveContractId(contractId);
-    persistState(openContracts, contractId);
+    persistState(openContracts);
   };
 
   const handleMethodSelect = (contractId: string, uid: string) => {
@@ -240,12 +248,8 @@ const ExplorerPage = () => {
   };
 
   const handleWorkspaceRename = (name: string) => {
-    const ws = createWorkspace(
-      name,
-      openContracts.map(c => ({ address: c.address, chainId: c.chainId })),
-    );
-    saveOpenContracts([], null);
-    router.push(`/workspace/${ws.id}`);
+    setWorkspaceName(name);
+    renameWorkspace(workspaceId, name);
   };
 
   if (!isLoaded) {
@@ -283,7 +287,7 @@ const ExplorerPage = () => {
                 onAddFunctions={handleAddFunctions}
                 onRemoveFromAbi={handleRemoveFromAbiSidebar}
                 onOpenAddPopup={() => setShowAddPopup(true)}
-                workspaceName=""
+                workspaceName={workspaceName}
                 onWorkspaceRename={handleWorkspaceRename}
               />
             </div>
@@ -342,4 +346,4 @@ const ExplorerPage = () => {
   );
 };
 
-export default ExplorerPage;
+export default WorkspacePage;
