@@ -70,6 +70,24 @@ const ExplorerPage = () => {
     if (!router.isReady || initializedRef.current) return;
     initializedRef.current = true;
 
+    const shareParam = router.query.s as string | undefined;
+    if (shareParam) {
+      const entries = shareParam
+        .split(",")
+        .map(e => {
+          const [address, chainIdStr] = e.split("@");
+          return { address, chainId: parseInt(chainIdStr) };
+        })
+        .filter(e => e.address && !isNaN(e.chainId));
+      if (entries.length > 0) {
+        saveOpenContracts(
+          entries.map(e => ({ chainId: e.chainId, address: e.address })),
+          null,
+        );
+        router.replace("/explorer", undefined, { shallow: true });
+      }
+    }
+
     const { contracts: saved, activeId } = getOpenContracts();
     if (saved.length === 0) {
       router.replace("/");
@@ -269,6 +287,13 @@ const ExplorerPage = () => {
     }
   };
 
+  const handleShare = () => {
+    const param = openContracts.map(c => `${c.address}@${c.chainId}`).join(",");
+    const url = `${window.location.origin}/explorer?s=${param}`;
+    navigator.clipboard.writeText(url);
+    notification.success("Share link copied!");
+  };
+
   const handleWorkspaceRename = (name: string) => {
     const ws = createWorkspace(
       name,
@@ -315,6 +340,7 @@ const ExplorerPage = () => {
                 onOpenAddPopup={() => setShowAddPopup(true)}
                 workspaceName=""
                 onWorkspaceRename={handleWorkspaceRename}
+                onShare={handleShare}
               />
             </div>
           </div>

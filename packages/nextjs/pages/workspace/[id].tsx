@@ -277,6 +277,13 @@ const WorkspacePage = () => {
     }
   };
 
+  const handleShare = () => {
+    const param = openContracts.map(c => `${c.address}@${c.chainId}`).join(",");
+    const url = `${window.location.origin}/explorer?s=${param}`;
+    navigator.clipboard.writeText(url);
+    notification.success("Share link copied!");
+  };
+
   const handleWorkspaceRename = (name: string) => {
     setWorkspaceName(name);
     renameWorkspace(workspaceId, name);
@@ -319,6 +326,7 @@ const WorkspacePage = () => {
                 onOpenAddPopup={() => setShowAddPopup(true)}
                 workspaceName={workspaceName}
                 onWorkspaceRename={handleWorkspaceRename}
+                onShare={handleShare}
               />
             </div>
           </div>
