@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ExplorerSidebarItem } from "./ExplorerSidebarItem";
-import { PencilIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { ArrowUpOnSquareIcon, PencilSquareIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { MiniFooter } from "~~/components/MiniFooter";
 import { ExplorerContract } from "~~/types/explorer";
 
@@ -17,6 +17,7 @@ type ExplorerSidebarProps = {
   onOpenAddPopup: () => void;
   workspaceName?: string;
   onWorkspaceRename?: (name: string) => void;
+  onShare?: () => void;
 };
 
 export const ExplorerSidebar = ({
@@ -32,6 +33,7 @@ export const ExplorerSidebar = ({
   onOpenAddPopup,
   workspaceName,
   onWorkspaceRename,
+  onShare,
 }: ExplorerSidebarProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState("");
@@ -72,13 +74,19 @@ export const ExplorerSidebar = ({
               placeholder="Workspace name"
             />
           ) : (
-            <button
-              className="flex items-center gap-1.5 text-sm font-semibold text-base-content/80 hover:text-base-content transition-colors w-full text-left"
-              onClick={handleStartEdit}
-            >
-              <span className="truncate">{workspaceName || "Unsaved Workspace"}</span>
-              <PencilIcon className="h-3.5 w-3.5 shrink-0 opacity-60" />
-            </button>
+            <div className="flex items-center gap-1 w-full">
+              <span className="truncate text-sm font-semibold text-base-content/80">
+                {workspaceName || "Unsaved Workspace"}
+              </span>
+              <button className="btn btn-ghost btn-xs px-1 shrink-0" onClick={handleStartEdit}>
+                <PencilSquareIcon className="h-3.5 w-3.5 opacity-60" />
+              </button>
+              {onShare && (
+                <button className="btn btn-ghost btn-xs px-1 shrink-0" onClick={onShare}>
+                  <ArrowUpOnSquareIcon className="h-3.5 w-3.5 opacity-60" />
+                </button>
+              )}
+            </div>
           )}
         </div>
       )}
