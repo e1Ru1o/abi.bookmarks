@@ -71,7 +71,7 @@ export const MethodSelector = ({
       {onAddFunctions && (
         <button className="btn btn-outline btn-sm w-full mb-4 gap-1" onClick={onAddFunctions}>
           <PlusIcon className="h-4 w-4" />
-          Add Functions (Import ABI)
+          Add Functions
         </button>
       )}
 

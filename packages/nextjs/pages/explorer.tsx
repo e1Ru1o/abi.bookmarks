@@ -24,6 +24,7 @@ import {
   saveOpenContracts,
   updateBookmarkLabel,
 } from "~~/utils/abiBookmarks";
+import { fetchAbiFromEtherscan, guessAbiWithHeimdall } from "~~/utils/fetchAbi";
 import { notification } from "~~/utils/scaffold-eth";
 
 function makeContractId(chainId: number, address: string): string {
@@ -54,6 +55,7 @@ const ExplorerPage = () => {
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [showAbiInput, setShowAbiInput] = useState<string | null>(null);
   const [localContractAbi, setLocalContractAbi] = useState("");
+  const [fetchingSource, setFetchingSource] = useState<"etherscan" | "heimdall" | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   const { chains, setTargetNetwork } = useGlobalState(state => ({
@@ -206,6 +208,34 @@ const ExplorerPage = () => {
     addRecentContract(contract.chainId, contract.address, label);
   };
 
+  const handleFetchEtherscan = async () => {
+    const contract = openContracts.find(c => c.id === showAbiInput);
+    if (!contract) return;
+    setFetchingSource("etherscan");
+    try {
+      const abi = await fetchAbiFromEtherscan(contract.address, contract.chainId);
+      setLocalContractAbi(JSON.stringify(abi, null, 2));
+    } catch {
+      notification.error("Could not fetch ABI. Contract may not be verified.");
+    } finally {
+      setFetchingSource(null);
+    }
+  };
+
+  const handleGuessHeimdall = async () => {
+    const contract = openContracts.find(c => c.id === showAbiInput);
+    if (!contract) return;
+    setFetchingSource("heimdall");
+    try {
+      const abi = await guessAbiWithHeimdall(contract.address, contract.chainId, Object.values(chains));
+      setLocalContractAbi(JSON.stringify(abi, null, 2));
+    } catch {
+      notification.error("Could not guess ABI via Heimdall.");
+    } finally {
+      setFetchingSource(null);
+    }
+  };
+
   const handleImportAbi = () => {
     if (!showAbiInput) return;
     const contract = openContracts.find(c => c.id === showAbiInput);
@@ -314,6 +344,34 @@ const ExplorerPage = () => {
             <p className="text-sm text-base-content/70">
               Paste additional ABI entries. They will be merged with the existing ABI.
             </p>
+            <div className="flex gap-2">
+              <div className="tooltip" data-tip="from Etherscan">
+                <button
+                  className="btn btn-outline btn-sm"
+                  onClick={handleFetchEtherscan}
+                  disabled={fetchingSource !== null}
+                >
+                  {fetchingSource === "etherscan" ? (
+                    <span className="loading loading-spinner loading-xs" />
+                  ) : (
+                    "Fetch ABI"
+                  )}
+                </button>
+              </div>
+              <div className="tooltip" data-tip="with Heimdall">
+                <button
+                  className="btn btn-outline btn-sm"
+                  onClick={handleGuessHeimdall}
+                  disabled={fetchingSource !== null}
+                >
+                  {fetchingSource === "heimdall" ? (
+                    <span className="loading loading-spinner loading-xs" />
+                  ) : (
+                    "Guess ABI"
+                  )}
+                </button>
+              </div>
+            </div>
             <textarea
               className="textarea bg-neutral w-full h-40 resize-none font-mono text-sm"
               placeholder="Paste ABI JSON here"
